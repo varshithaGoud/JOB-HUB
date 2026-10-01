@@ -1,11 +1,21 @@
-# 💼 JobHub — Enterprise Job Search & Recruiting Platform
+# 💼 JobHub — Enterprise Job Search & Hiring Platform
 
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-JobHub_Portal-6366f1?style=for-the-badge&logo=github)](https://varshithagoud.github.io/JobHub/)
 [![Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot%204.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java 17](https://img.shields.io/badge/Language-Java%2017-blue.svg)](https://www.oracle.com/java/)
 [![H2 Database](https://img.shields.io/badge/Database-H2%20In--Memory-orange.svg)](https://www.h2database.com/)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 
 **JobHub** is a full-stack, enterprise-grade job portal and recruitment management platform. It seamlessly connects candidates looking for tech and business opportunities with recruiters and hiring managers managing job postings and reviewing applicant pipelines.
+
+---
+
+## 🚀 Live Demo & Preview
+
+- 🌐 **Live Web Application (GitHub Pages)**: [https://varshithagoud.github.io/JobHub/](https://varshithagoud.github.io/JobHub/)
+- 🌐 **Fallback / Alternative Demo URL**: [https://varshithagoud.github.io/VIP-C2-BOOK-A-DOCTOR/](https://varshithagoud.github.io/VIP-C2-BOOK-A-DOCTOR/)
+
+> **Note**: The frontend interactive UI features full live mock mode and seamlessly connects to the Spring Boot REST API backend running on `http://localhost:8080`.
 
 ---
 
@@ -29,6 +39,18 @@
 - **Platform Analytics**: Real-time stats on total users, candidates vs recruiters split, active listings, and total submitted applications.
 - **User Management**: View all registered platform accounts with role badges and account moderation.
 - **Listing Audit**: Audit and remove job postings across the network.
+
+---
+
+## 🔑 1-Click Demo Login Credentials
+
+Try the interactive platform instantly using pre-configured demo roles:
+
+| Role | Email | Password | Access Rights |
+| :--- | :--- | :--- | :--- |
+| **Candidate (Alex)** | `alex@seeker.com` | `seeker123` | Search jobs, submit applications, track status |
+| **Recruiter (Sarah)** | `techcorp@jobs.com` | `recruiter123` | Post new listings, review applicants, accept/reject candidate |
+| **System Admin** | `admin@jobhub.com` | `admin123` | System metrics, manage all users and job listings |
 
 ---
 
@@ -83,41 +105,34 @@
 
 ---
 
-## ⚡ Quick Start Guide
-
-### Prerequisites
-- Java 17+ installed
-- Git
+## ⚡ Local Setup Guide
 
 ### 1. Clone & Run Backend
 ```bash
-git clone https://github.com/varshithaGoud/VIP-C2-BOOK-A-DOCTOR.git
-cd VIP-C2-BOOK-A-DOCTOR/backend/JobHub
+git clone https://github.com/varshithaGoud/JobHub.git
+cd JobHub/backend/JobHub
 
 # Run Spring Boot Application
 .\mvnw.cmd spring-boot:run
 ```
-*(Backend starts on `http://localhost:8080`. Sample demo data is automatically seeded on startup).*
 
 ### 2. Launch Frontend UI
 Open `index.html` in your web browser:
-- Double click `index.html` in file explorer or serve via Vite:
-  ```bash
-  cd VIP-C2-BOOK-A-DOCTOR
-  npm run dev
-  ```
+```bash
+cd JobHub
+npm run dev
+```
 
 ---
 
-## 🔑 Demo Access Accounts
+## ⚙️ How to Enable GitHub Pages (Free Live Hosting)
 
-Use the 1-Click Demo Login bar at the top of the app or login with these credentials:
-
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Candidate (Alex)** | `alex@seeker.com` | `seeker123` |
-| **Recruiter (Sarah)** | `techcorp@jobs.com` | `recruiter123` |
-| **System Admin** | `admin@jobhub.com` | `admin123` |
+To activate live website hosting directly on GitHub in 10 seconds:
+1. Open your repository settings: **Settings ➔ Pages**
+2. Under **Build and deployment**:
+   - Source: **Deploy from a branch**
+   - Branch: Select **`main`** and **`/ (root)`**
+3. Click **Save**. GitHub will publish your live website URL in ~1 minute!
 
 ---
 
