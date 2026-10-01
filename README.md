@@ -1,6 +1,6 @@
 # 💼 JobHub — Enterprise Job Search & Hiring Platform
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-JobHub_Portal-6366f1?style=for-the-badge&logo=github)](https://varshithagoud.github.io/JobHub/)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-JobHub_Portal-6366f1?style=for-the-badge&logo=github)](https://varshithagoud.github.io/JOB-HUB/)
 [![Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot%204.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java 17](https://img.shields.io/badge/Language-Java%2017-blue.svg)](https://www.oracle.com/java/)
 [![H2 Database](https://img.shields.io/badge/Database-H2%20In--Memory-orange.svg)](https://www.h2database.com/)
@@ -12,8 +12,8 @@
 
 ## 🚀 Live Demo & Preview
 
-- 🌐 **Live Web Application (GitHub Pages)**: [https://varshithagoud.github.io/JobHub/](https://varshithagoud.github.io/JobHub/)
-- 🌐 **Fallback / Alternative Demo URL**: [https://varshithagoud.github.io/VIP-C2-BOOK-A-DOCTOR/](https://varshithagoud.github.io/VIP-C2-BOOK-A-DOCTOR/)
+- 🌐 **Live Web Application (GitHub Pages)**: [https://varshithagoud.github.io/JOB-HUB/](https://varshithagoud.github.io/JOB-HUB/)
+- 📦 **GitHub Repository**: [https://github.com/varshithaGoud/JOB-HUB](https://github.com/varshithaGoud/JOB-HUB)
 
 > **Note**: The frontend interactive UI features full live mock mode and seamlessly connects to the Spring Boot REST API backend running on `http://localhost:8080`.
 
@@ -109,8 +109,8 @@ Try the interactive platform instantly using pre-configured demo roles:
 
 ### 1. Clone & Run Backend
 ```bash
-git clone https://github.com/varshithaGoud/JobHub.git
-cd JobHub/backend/JobHub
+git clone https://github.com/varshithaGoud/JOB-HUB.git
+cd JOB-HUB/backend/JobHub
 
 # Run Spring Boot Application
 .\mvnw.cmd spring-boot:run
@@ -119,7 +119,7 @@ cd JobHub/backend/JobHub
 ### 2. Launch Frontend UI
 Open `index.html` in your web browser:
 ```bash
-cd JobHub
+cd JOB-HUB
 npm run dev
 ```
 
@@ -127,12 +127,12 @@ npm run dev
 
 ## ⚙️ How to Enable GitHub Pages (Free Live Hosting)
 
-To activate live website hosting directly on GitHub in 10 seconds:
-1. Open your repository settings: **Settings ➔ Pages**
+To activate your live website on GitHub in 10 seconds:
+1. Go to repository settings: **[https://github.com/varshithaGoud/JOB-HUB/settings/pages](https://github.com/varshithaGoud/JOB-HUB/settings/pages)**
 2. Under **Build and deployment**:
    - Source: **Deploy from a branch**
    - Branch: Select **`main`** and **`/ (root)`**
-3. Click **Save**. GitHub will publish your live website URL in ~1 minute!
+3. Click **Save**. Your live site will be published at: [https://varshithagoud.github.io/JOB-HUB/](https://varshithagoud.github.io/JOB-HUB/)
 
 ---
 
