@@ -1,21 +1,29 @@
 # 💼 JobHub — Enterprise Job Search & Hiring Platform
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-JobHub_Portal-6366f1?style=for-the-badge&logo=github)](https://varshithagoud.github.io/JOB-HUB/)
-[![Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot%204.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Live Frontend Demo](https://img.shields.io/badge/🌐_Frontend-GitHub_Pages-6366f1?style=for-the-badge&logo=github)](https://varshithagoud.github.io/JOB-HUB/)
+[![Backend Status](https://img.shields.io/badge/⚙️_Backend-Spring_Boot_8080-10b981?style=for-the-badge&logo=spring)](http://localhost:8080/api/jobs)
 [![Java 17](https://img.shields.io/badge/Language-Java%2017-blue.svg)](https://www.oracle.com/java/)
-[![H2 Database](https://img.shields.io/badge/Database-H2%20In--Memory-orange.svg)](https://www.h2database.com/)
+[![H2 Database](https://img.shields.io/badge/Database-H2%20In--Memory-orange.svg)](http://localhost:8080/h2-console)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 
 **JobHub** is a full-stack, enterprise-grade job portal and recruitment management platform. It seamlessly connects candidates looking for tech and business opportunities with recruiters and hiring managers managing job postings and reviewing applicant pipelines.
 
 ---
 
-## 🚀 Live Demo & Preview
+## 🌐 Application URLs
 
-- 🌐 **Live Web Application (GitHub Pages)**: [https://varshithagoud.github.io/JOB-HUB/](https://varshithagoud.github.io/JOB-HUB/)
-- 📦 **GitHub Repository**: [https://github.com/varshithaGoud/JOB-HUB](https://github.com/varshithaGoud/JOB-HUB)
+### 🎨 Frontend Application URLs
+- 🚀 **Live Demo (GitHub Pages)**: [https://varshithagoud.github.io/JOB-HUB/](https://varshithagoud.github.io/JOB-HUB/)
+- 💻 **Local Frontend (Vite Dev Server)**: `http://localhost:5173`
+- 📄 **Static File Path**: `index.html` (Open directly in any modern browser)
 
-> **Note**: The frontend interactive UI features full live mock mode and seamlessly connects to the Spring Boot REST API backend running on `http://localhost:8080`.
+### ⚙️ Backend API URLs
+- 🔌 **API Base URL**: `http://localhost:8080/api`
+- 💼 **Jobs Endpoint**: `http://localhost:8080/api/jobs`
+- 👤 **Users / Auth Endpoint**: `http://localhost:8080/api/users`
+- 📄 **Applications Endpoint**: `http://localhost:8080/api/applications`
+- 📊 **Platform Statistics**: `http://localhost:8080/api/stats`
+- 🗄️ **H2 Database Console**: `http://localhost:8080/h2-console` *(JDBC URL: `jdbc:h2:mem:jobhubdb`, User: `sa`, Password: empty)*
 
 ---
 
@@ -67,7 +75,7 @@ Try the interactive platform instantly using pre-configured demo roles:
 
 ---
 
-## 🔌 REST API Endpoints
+## 🔌 REST API Endpoints Table
 
 ### 👤 User & Authentication APIs (`/api/users`)
 | Method | Endpoint | Description |
@@ -122,17 +130,6 @@ Open `index.html` in your web browser:
 cd JOB-HUB
 npm run dev
 ```
-
----
-
-## ⚙️ How to Enable GitHub Pages (Free Live Hosting)
-
-To activate your live website on GitHub in 10 seconds:
-1. Go to repository settings: **[https://github.com/varshithaGoud/JOB-HUB/settings/pages](https://github.com/varshithaGoud/JOB-HUB/settings/pages)**
-2. Under **Build and deployment**:
-   - Source: **Deploy from a branch**
-   - Branch: Select **`main`** and **`/ (root)`**
-3. Click **Save**. Your live site will be published at: [https://varshithagoud.github.io/JOB-HUB/](https://varshithagoud.github.io/JOB-HUB/)
 
 ---
 
