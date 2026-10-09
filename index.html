@@ -246,25 +246,109 @@
             }
         }
 
+        const FALLBACK_JOBS = [
+            {
+                id: 1,
+                title: "Senior Full-Stack Developer",
+                company: "TechCorp Inc.",
+                location: "Remote / San Francisco",
+                salary: "$140,000 - $165,000",
+                jobType: "Full Time",
+                category: "Engineering",
+                experienceLevel: "Senior Level",
+                description: "We are looking for a Senior Full-Stack Developer to lead architectural decisions across our core cloud platforms. You will work closely with backend Java/Spring Boot microservices and modern reactive frontends.",
+                postedDate: "2026-10-09"
+            },
+            {
+                id: 2,
+                title: "UI/UX Product Designer",
+                company: "NextGen AI",
+                location: "San Francisco, CA",
+                salary: "$115,000 - $135,000",
+                jobType: "Full Time",
+                category: "Design",
+                experienceLevel: "Mid Level",
+                description: "Join our design team to craft beautiful visual interfaces, design systems, and micro-interactions for our generative AI suite.",
+                postedDate: "2026-10-09"
+            },
+            {
+                id: 3,
+                title: "Machine Learning Researcher",
+                company: "NextGen AI",
+                location: "Remote",
+                salary: "$155,000 - $185,000",
+                jobType: "Full Time",
+                category: "Data & AI",
+                experienceLevel: "Senior Level",
+                description: "Opportunity to train and fine-tune large language models and neural architectures for specialized enterprise applications.",
+                postedDate: "2026-10-09"
+            },
+            {
+                id: 4,
+                title: "DevOps & Cloud Engineer",
+                company: "TechCorp Inc.",
+                location: "New York, NY",
+                salary: "$130,000 - $150,000",
+                jobType: "Full Time",
+                category: "Engineering",
+                experienceLevel: "Mid Level",
+                description: "Build scalable Kubernetes clusters, Automated CI/CD pipelines, and maintain high-availability cloud infrastructure on AWS.",
+                postedDate: "2026-10-09"
+            },
+            {
+                id: 5,
+                title: "Technical Product Manager",
+                company: "InnovateLabs",
+                location: "Hybrid (Chicago, IL)",
+                salary: "$120,000 - $140,000",
+                jobType: "Full Time",
+                category: "Product",
+                experienceLevel: "Senior Level",
+                description: "Drive product vision, roadmap, and cross-functional team execution for enterprise SaaS platform solutions.",
+                postedDate: "2026-10-09"
+            },
+            {
+                id: 6,
+                title: "Frontend React Specialist",
+                company: "CloudScale Technologies",
+                location: "Remote",
+                salary: "$100,000 - $120,000",
+                jobType: "Full Time",
+                category: "Engineering",
+                experienceLevel: "Mid Level",
+                description: "Create responsive, high-performance web dashboards and interactive visualizations using modern React & JavaScript ecosystem.",
+                postedDate: "2026-10-09"
+            }
+        ];
+
         // Fetch all jobs
         function loadJobs() {
-            fetch(`${API_BASE}/jobs`)
-                .then(res => res.json())
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 5000) : null;
+
+            fetch(`${API_BASE}/jobs`, controller ? { signal: controller.signal } : {})
+                .then(res => {
+                    if (timeoutId) clearTimeout(timeoutId);
+                    if (!res.ok) throw new Error("HTTP error " + res.status);
+                    return res.json();
+                })
                 .then(data => {
                     allJobs = data;
                     renderJobs(allJobs);
                 })
                 .catch(err => {
-                    document.getElementById("jobsContainer").innerHTML = `
-                        <div class="col-12 text-center py-5">
-                            <div class="glass-card p-4 mx-auto" style="max-width: 500px;">
-                                <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
-                                <h5 class="text-white">Backend Connection Error</h5>
-                                <p class="text-secondary small mb-3">Make sure the Spring Boot backend server is running on <code>http://localhost:8080</code>.</p>
-                                <button onclick="loadJobs()" class="btn btn-glass btn-sm"><i class="fas fa-redo me-1"></i> Retry Connection</button>
-                            </div>
-                        </div>
-                    `;
+                    if (timeoutId) clearTimeout(timeoutId);
+                    console.warn("Backend server slow or sleeping. Displaying fallback sample jobs:", err);
+                    allJobs = FALLBACK_JOBS;
+                    renderJobs(allJobs);
+
+                    // Background retry to connect when Render wakes up
+                    setTimeout(() => {
+                        fetch(`${API_BASE}/jobs`)
+                            .then(r => r.ok ? r.json() : null)
+                            .then(d => { if (d && d.length) { allJobs = d; renderJobs(allJobs); } })
+                            .catch(() => {});
+                    }, 5000);
                 });
         }
 
