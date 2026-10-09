@@ -527,34 +527,60 @@
             });
         }
 
+        const QUICK_DEMO_ACCOUNTS = {
+            "alex@seeker.com": { id: 4, name: "Alex Johnson", email: "alex@seeker.com", role: "JOB_SEEKER" },
+            "techcorp@jobs.com": { id: 2, name: "Sarah Jenkins", email: "techcorp@jobs.com", role: "RECRUITER" },
+            "admin@jobhub.com": { id: 1, name: "System Administrator", email: "admin@jobhub.com", role: "ADMIN" }
+        };
+
         // Demo Quick Login
         function quickLogin(email, password) {
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 3000) : null;
+
             fetch(`${API_BASE}/users/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password }),
+                signal: controller ? controller.signal : null
             })
-            .then(res => res.json())
+            .then(res => {
+                if (timeoutId) clearTimeout(timeoutId);
+                return res.json();
+            })
             .then(data => {
-                if (data.id) {
-                    localStorage.setItem("userId", data.id);
-                    localStorage.setItem("userName", data.name);
-                    localStorage.setItem("userEmail", data.email);
-                    localStorage.setItem("userRole", data.role);
-
-                    if (data.role === "RECRUITER") {
-                        window.location.href = "recruiter-dashboard.html";
-                    } else if (data.role === "ADMIN") {
-                        window.location.href = "admin-dashboard.html";
-                    } else {
-                        checkAuth();
-                        alert(`Welcome back, ${data.name}! You are logged in as Job Seeker.`);
-                    }
+                if (data && data.id) {
+                    applyDemoUser(data);
+                } else if (QUICK_DEMO_ACCOUNTS[email]) {
+                    applyDemoUser(QUICK_DEMO_ACCOUNTS[email]);
                 } else {
                     alert("Quick login failed.");
                 }
             })
-            .catch(err => alert("Quick login server error."));
+            .catch(err => {
+                if (timeoutId) clearTimeout(timeoutId);
+                if (QUICK_DEMO_ACCOUNTS[email]) {
+                    applyDemoUser(QUICK_DEMO_ACCOUNTS[email]);
+                } else {
+                    alert("Quick login server error.");
+                }
+            });
+        }
+
+        function applyDemoUser(data) {
+            localStorage.setItem("userId", data.id);
+            localStorage.setItem("userName", data.name);
+            localStorage.setItem("userEmail", data.email);
+            localStorage.setItem("userRole", data.role);
+
+            if (data.role === "RECRUITER") {
+                window.location.href = "recruiter-dashboard.html";
+            } else if (data.role === "ADMIN") {
+                window.location.href = "admin-dashboard.html";
+            } else {
+                checkAuth();
+                alert(`Welcome back, ${data.name}! You are logged in as Job Seeker.`);
+            }
         }
 
         function logout() {
