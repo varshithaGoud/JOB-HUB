@@ -1,0 +1,25 @@
+# Build output & targets
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Node & dependencies
+node_modules/
+dist/
+.vite/
+
+# IDE & Editor files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# System & log files
+*.log
+.DS_Store
+Thumbs.db
+oracleJdk-27/
