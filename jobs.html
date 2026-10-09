@@ -12,7 +12,7 @@
 <div id="jobs" class="row"><p class="text-center">Loading jobs...</p></div></div>
 <script>
 let allJobs=[];
-const API_BASE = "https://jobhub-backend.onrender.com/api";
+const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:8080/api" : "https://jobhub-backend.onrender.com/api";
 fetch(`${API_BASE}/jobs`).then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{allJobs=d;displayJobs(d)}).catch(()=>jobs.innerHTML="<p class='text-danger text-center'>Unable to load jobs. Start backend.</p>");
 function displayJobs(list){let o="";if(!list.length)o="<p class='text-center'>No jobs found.</p>";list.forEach(j=>o+=`<div class="col-md-4 mb-4"><div class="card shadow h-100"><div class="card-body">
 <h4>${esc(j.title)}</h4><h6 class="text-primary">${esc(j.company)}</h6><p>📍 ${esc(j.location)}</p><p>💰 ${esc(j.salary)}</p><p>💼 ${esc(j.jobType)}</p><p>${esc(j.description||"")}</p>
