@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Platform Administrator",
+    "email": "admin@jobhub.com",
+    "password": "admin",
+    "role": "ADMIN",
+    "title": "Platform Admin",
+    "createdAt": "2026-01-01"
+  },
+  {
+    "id": 2,
+    "name": "Sarah Jenkins",
+    "email": "recruiter@jobhub.com",
+    "password": "recruiter",
+    "role": "RECRUITER",
+    "title": "Talent Acquisition Lead at Google Cloud",
+    "createdAt": "2026-01-02"
+  },
+  {
+    "id": 3,
+    "name": "Varshitha Goud",
+    "email": "user@jobhub.com",
+    "password": "user",
+    "role": "JOB_SEEKER",
+    "title": "Software Engineer",
+    "createdAt": "2026-01-03"
+  },
+  {
+    "id": 4,
+    "name": "Alex Johnson",
+    "email": "alex@seeker.com",
+    "password": "user",
+    "role": "JOB_SEEKER",
+    "title": "Senior Full-Stack Developer",
+    "createdAt": "2026-01-04"
+  },
+  {
+    "id": 5,
+    "name": "Marcus Vance",
+    "email": "techcorp@jobs.com",
+    "password": "recruiter",
+    "role": "RECRUITER",
+    "title": "Technical Recruiter at Netflix",
+    "createdAt": "2026-01-05"
+  },
+  {
+    "id": 1791624410508,
+    "name": "Test Seeker",
+    "email": "test_seeker_99@jobhub.com",
+    "password": "pass",
+    "role": "JOB_SEEKER",
+    "title": "Candidate",
+    "createdAt": "2026-10-10"
+  }
+]

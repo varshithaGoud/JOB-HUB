@@ -1,10 +1,12 @@
 services:
   - type: web
     name: jobhub-backend
-    env: java
-    rootDir: backend/JobHub
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/JobHub-0.0.1-SNAPSHOT.jar
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
     envVars:
       - key: PORT
         value: 8080
+      - key: NODE_ENV
+        value: production
