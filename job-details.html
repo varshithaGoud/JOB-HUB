@@ -1,19 +1,379 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Job Details - JobHub</title><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Details - JobHub</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="style.css" rel="stylesheet">
 </head>
-<body class="bg-light"><nav class="navbar navbar-dark bg-primary"><div class="container"><a class="navbar-brand" href="jobs.html">JobHub</a><a class="btn btn-light" href="jobs.html">All Jobs</a></div></nav>
-<div class="container mt-5"><div id="job" class="card shadow p-4">Loading job details...</div></div>
-<script>
-const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:8080/api" : "https://jobhub-backend.onrender.com/api";
-const id=new URLSearchParams(location.search).get("id");
-fetch(API_BASE+"/jobs/"+id).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>job.innerHTML=`<h2>${esc(j.title)}</h2><h5 class="text-primary">${esc(j.company)}</h5><hr>
-<p><b>Location:</b> ${esc(j.location)}</p><p><b>Salary:</b> ${esc(j.salary)}</p><p><b>Job Type:</b> ${esc(j.jobType)}</p><p><b>Description:</b></p><p>${esc(j.description||"")}</p><hr>
-<button class="btn btn-success" onclick="applyJob()">Apply Now</button> <a href="jobs.html" class="btn btn-secondary">Back to Jobs</a>`).catch(()=>job.innerHTML='<p class="text-danger">Unable to load job details.</p>');
-function applyJob(){const uid=localStorage.getItem("userId");if(!uid){alert("Please login first!");location.href="login.html";return}
-fetch(API_BASE+"/applications",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jobId:Number(id),userId:Number(uid)})})
-.then(async r=>{const d=await r.json();if(!r.ok)throw Error(typeof d==="string"?d:"Failed to apply");alert("Application submitted successfully!");location.href="my-applications.html"}).catch(e=>alert(e.message||"Failed to apply!"))}
-function esc(v){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
-</script></body></html>
+<body>
+
+    <!-- Glass Navbar -->
+    <nav class="navbar navbar-expand-lg glass-nav">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+                <div class="company-avatar" style="width: 38px; height: 38px; font-size: 1.1rem;">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <span class="fs-4 fw-bold text-white">Job<span style="color: var(--primary);">Hub</span></span>
+            </a>
+
+            <div class="d-flex align-items-center gap-2">
+                <a href="jobs.html" class="btn btn-glass btn-sm"><i class="fas fa-arrow-left me-1"></i> Back to Jobs</a>
+                <a href="my-applications.html" class="btn btn-glass btn-sm"><i class="fas fa-file-invoice me-1"></i> My Applications</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container py-4">
+        <div id="jobDetailContainer">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary"></div>
+                <p class="text-secondary mt-2">Loading position details...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Modal -->
+    <div class="modal fade" id="applyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-glass">
+                <div class="modal-header modal-header-glass">
+                    <h5 class="modal-title text-white"><i class="fas fa-paper-plane text-primary me-2"></i>Apply for this Role</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form onsubmit="handleApplySubmit(event)">
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">Position Title</label>
+                            <input type="text" id="applyTitle" class="form-control form-control-custom" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">Hiring Company</label>
+                            <input type="text" id="applyCompany" class="form-control form-control-custom" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">Full Name *</label>
+                            <input type="text" id="applyName" class="form-control form-control-custom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">Email Address *</label>
+                            <input type="email" id="applyEmail" class="form-control form-control-custom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">Portfolio / Resume / LinkedIn URL</label>
+                            <input type="url" id="applyResume" class="form-control form-control-custom" placeholder="https://github.com/yourname or LinkedIn">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">Cover Letter / Note to Recruiter</label>
+                            <textarea id="applyLetter" class="form-control form-control-custom" rows="3" placeholder="Why are you a great match for this role?"></textarea>
+                        </div>
+                        <div id="applyStatusMsg" class="small"></div>
+                    </div>
+                    <div class="modal-footer border-secondary border-opacity-25">
+                        <button type="button" class="btn btn-glass" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="applyBtnSubmit" class="btn btn-primary-gradient">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core Data Layer -->
+    <script src="script.js"></script>
+
+    <script>
+        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+            ? "http://localhost:8080/api"
+            : "https://jobhub-backend.onrender.com/api";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const jobId = urlParams.get("id");
+        let currentJob = null;
+        let applyModal = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            applyModal = new bootstrap.Modal(document.getElementById('applyModal'));
+            if (!jobId) {
+                renderNotFound();
+                return;
+            }
+            loadJobDetails(jobId);
+        });
+
+        function loadJobDetails(id) {
+            // First check memory
+            if (window.JobHubStore) {
+                currentJob = JobHubStore.getJobById(id);
+                if (currentJob) {
+                    renderJobView(currentJob);
+                }
+            }
+
+            // Also fetch from backend
+            fetch(`${API_BASE}/jobs/${id}`)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                })
+                .then(job => {
+                    if (job && job.title) {
+                        currentJob = job;
+                        renderJobView(currentJob);
+                    }
+                })
+                .catch(() => {
+                    if (!currentJob) {
+                        if (window.JobHubStore) {
+                            currentJob = JobHubStore.getJobById(id);
+                        }
+                        if (currentJob) {
+                            renderJobView(currentJob);
+                        } else {
+                            renderNotFound();
+                        }
+                    }
+                });
+        }
+
+        function renderNotFound() {
+            document.getElementById("jobDetailContainer").innerHTML = `
+                <div class="glass-card p-5 text-center max-w-2xl mx-auto my-5">
+                    <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                    <h3 class="text-white">Job Position Not Found</h3>
+                    <p class="text-secondary">This listing may have expired or been removed by the recruiter.</p>
+                    <a href="jobs.html" class="btn btn-primary-gradient mt-2"><i class="fas fa-arrow-left me-1"></i> Browse Other Positions</a>
+                </div>
+            `;
+        }
+
+        function renderJobView(job) {
+            const initial = (job.company || "C").charAt(0).toUpperCase();
+            document.title = `${job.title} at ${job.company} - JobHub`;
+
+            document.getElementById("jobDetailContainer").innerHTML = `
+                <!-- Hero Header Card -->
+                <div class="glass-card p-4 p-md-5 mb-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="company-avatar" style="width: 64px; height: 64px; font-size: 1.8rem;">
+                                ${initial}
+                            </div>
+                            <div>
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    <h2 class="text-white fw-bold mb-0">${escapeHtml(job.title)}</h2>
+                                    <span class="badge-custom badge-tech">${escapeHtml(job.jobType || 'Full Time')}</span>
+                                </div>
+                                <h5 class="text-primary fw-semibold mb-3">
+                                    <i class="fas fa-building me-1"></i> ${escapeHtml(job.company)}
+                                </h5>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-dark text-secondary border border-secondary border-opacity-25 py-2 px-3">
+                                        <i class="fas fa-map-marker-alt me-1 text-primary"></i> ${escapeHtml(job.location)}
+                                    </span>
+                                    <span class="badge bg-dark text-success border border-success border-opacity-25 py-2 px-3">
+                                        <i class="fas fa-dollar-sign me-1"></i> ${escapeHtml(job.salary || 'Competitive Pay')}
+                                    </span>
+                                    <span class="badge bg-dark text-info border border-info border-opacity-25 py-2 px-3">
+                                        <i class="fas fa-layer-group me-1"></i> ${escapeHtml(job.category || 'Technology')}
+                                    </span>
+                                    <span class="badge bg-dark text-warning border border-warning border-opacity-25 py-2 px-3">
+                                        <i class="fas fa-briefcase me-1"></i> ${escapeHtml(job.experienceLevel || 'Mid-Senior Level')}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column gap-2">
+                            <button onclick="openApplyModal()" class="btn btn-primary-gradient px-4 py-2.5">
+                                <i class="fas fa-paper-plane me-2"></i> Apply for this Role
+                            </button>
+                            <button onclick="shareJob()" class="btn btn-glass btn-sm">
+                                <i class="fas fa-share-alt me-1"></i> Share Position
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two-Column Content Grid -->
+                <div class="row g-4">
+                    <!-- Left: Description & Perks -->
+                    <div class="col-lg-8">
+                        <div class="glass-card p-4 p-md-5 mb-4">
+                            <h4 class="text-white mb-3"><i class="fas fa-align-left text-primary me-2"></i>Role Description</h4>
+                            <p class="text-secondary leading-relaxed mb-4" style="font-size: 1.05rem;">
+                                ${escapeHtml(job.description || "As part of our high-velocity team, you will design, architect, and deliver scalable enterprise systems with high reliability, performance, and security.")}
+                            </p>
+
+                            <h5 class="text-white mb-3"><i class="fas fa-check-circle text-success me-2"></i>Key Responsibilities</h5>
+                            <ul class="text-secondary mb-4 ps-3" style="line-height: 1.8;">
+                                <li>Architect and implement robust, testable, and maintainable software features.</li>
+                                <li>Collaborate across multidisciplinary teams including engineering, product, and design.</li>
+                                <li>Participate in peer code reviews, continuous deployment practices, and technical design discussions.</li>
+                                <li>Drive technical excellence, scalability improvements, and latency reduction across production services.</li>
+                            </ul>
+
+                            <h5 class="text-white mb-3"><i class="fas fa-award text-warning me-2"></i>Candidate Qualifications</h5>
+                            <ul class="text-secondary mb-4 ps-3" style="line-height: 1.8;">
+                                <li>Demonstrated experience building real-world applications in production environments.</li>
+                                <li>Strong proficiency in modern programming languages, frameworks, and database architectures.</li>
+                                <li>Clear verbal and written communication skills with strong team empathy.</li>
+                                <li>Passion for shipping impactful products and continuous learning.</li>
+                            </ul>
+
+                            <h5 class="text-white mb-3"><i class="fas fa-gift text-info me-2"></i>Benefits & Perks</h5>
+                            <div class="row g-2 text-secondary">
+                                <div class="col-sm-6"><i class="fas fa-check text-emerald me-2" style="color:#10b981;"></i> Comprehensive Healthcare, Vision & Dental</div>
+                                <div class="col-sm-6"><i class="fas fa-check text-emerald me-2" style="color:#10b981;"></i> 401(k) Retirement Match Program</div>
+                                <div class="col-sm-6"><i class="fas fa-check text-emerald me-2" style="color:#10b981;"></i> Unlimited Flexible Paid Time Off (PTO)</div>
+                                <div class="col-sm-6"><i class="fas fa-check text-emerald me-2" style="color:#10b981;"></i> Annual Learning & Development Stipend</div>
+                                <div class="col-sm-6"><i class="fas fa-check text-emerald me-2" style="color:#10b981;"></i> Ergonomic Home Office Equipment Fund</div>
+                                <div class="col-sm-6"><i class="fas fa-check text-emerald me-2" style="color:#10b981;"></i> Wellness Subsidies & Gym Allowances</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Overview & Employer Sidebar -->
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4 mb-4">
+                            <h5 class="text-white mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Job Overview</h5>
+                            
+                            <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                                <span class="text-secondary small">Location</span>
+                                <span class="text-white small fw-semibold">${escapeHtml(job.location)}</span>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                                <span class="text-secondary small">Job Type</span>
+                                <span class="text-white small fw-semibold">${escapeHtml(job.jobType || 'Full Time')}</span>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                                <span class="text-secondary small">Salary</span>
+                                <span class="text-success small fw-semibold">${escapeHtml(job.salary || 'Competitive')}</span>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                                <span class="text-secondary small">Category</span>
+                                <span class="text-white small fw-semibold">${escapeHtml(job.category || 'Engineering')}</span>
+                            </div>
+                            <div class="d-flex justify-content-between py-2">
+                                <span class="text-secondary small">Posted Date</span>
+                                <span class="text-white small fw-semibold">${escapeHtml(job.postedDate || 'Recent')}</span>
+                            </div>
+
+                            <button onclick="openApplyModal()" class="btn btn-primary-gradient w-100 mt-4">
+                                <i class="fas fa-paper-plane me-1"></i> Apply Now
+                            </button>
+                        </div>
+
+                        <div class="glass-card p-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="company-avatar" style="width: 42px; height: 42px; font-size: 1.2rem;">
+                                    ${initial}
+                                </div>
+                                <div>
+                                    <h6 class="text-white fw-bold mb-0">${escapeHtml(job.company)}</h6>
+                                    <span class="text-secondary small">Verified Employer</span>
+                                </div>
+                            </div>
+                            <p class="text-secondary small mb-3">
+                                High-growth technology company empowering modern digital experiences worldwide.
+                            </p>
+                            <a href="jobs.html" class="btn btn-glass btn-sm w-100">
+                                <i class="fas fa-building me-1"></i> View More Jobs by Company
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openApplyModal() {
+            if (!currentJob) return;
+
+            document.getElementById("applyTitle").value = currentJob.title;
+            document.getElementById("applyCompany").value = currentJob.company;
+            document.getElementById("applyName").value = localStorage.getItem("userName") || "";
+            document.getElementById("applyEmail").value = localStorage.getItem("userEmail") || "";
+            document.getElementById("applyResume").value = "";
+            document.getElementById("applyLetter").value = "";
+            document.getElementById("applyStatusMsg").innerHTML = "";
+
+            applyModal.show();
+        }
+
+        function handleApplySubmit(e) {
+            e.preventDefault();
+            if (!currentJob) return;
+
+            const name = document.getElementById("applyName").value.trim();
+            const email = document.getElementById("applyEmail").value.trim();
+            const resume = document.getElementById("applyResume").value.trim();
+            const letter = document.getElementById("applyLetter").value.trim();
+            const msg = document.getElementById("applyStatusMsg");
+            const btn = document.getElementById("applyBtnSubmit");
+
+            const userId = localStorage.getItem("userId") ? Number(localStorage.getItem("userId")) : 4;
+
+            const application = {
+                id: Date.now(),
+                jobId: Number(currentJob.id),
+                jobTitle: currentJob.title,
+                company: currentJob.company,
+                userId: userId,
+                userName: name,
+                userEmail: email,
+                resumeUrl: resume,
+                coverLetter: letter,
+                status: "PENDING",
+                appliedDate: new Date().toISOString().split("T")[0]
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i> Submitting...`;
+
+            if (window.JobHubStore) {
+                JobHubStore.saveApplication(application);
+            }
+
+            fetch(`${API_BASE}/applications`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(application)
+            }).catch(() => {});
+
+            msg.innerHTML = `<span class="text-success"><i class="fas fa-check-circle me-1"></i> Application submitted successfully! Redirecting...</span>`;
+
+            setTimeout(() => {
+                applyModal.hide();
+                btn.disabled = false;
+                btn.innerHTML = `Submit Application`;
+                window.location.href = "my-applications.html";
+            }, 800);
+        }
+
+        function shareJob() {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href);
+                alert("📋 Position link copied to clipboard!");
+            } else {
+                alert("Link: " + window.location.href);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return String(text).replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[m]));
+        }
+    </script>
+</body>
+</html>

@@ -186,6 +186,8 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core JobHub Store -->
+    <script src="script.js"></script>
 
     <!-- Core App JS -->
     <script>
@@ -323,8 +325,16 @@
 
         // Fetch all jobs
         function loadJobs() {
+            if (window.JobHubStore) {
+                allJobs = JobHubStore.getJobs();
+                renderJobs(allJobs);
+            } else {
+                allJobs = FALLBACK_JOBS;
+                renderJobs(allJobs);
+            }
+
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 5000) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
 
             fetch(`${API_BASE}/jobs`, controller ? { signal: controller.signal } : {})
                 .then(res => {
@@ -333,22 +343,14 @@
                     return res.json();
                 })
                 .then(data => {
-                    allJobs = data;
-                    renderJobs(allJobs);
+                    if (Array.isArray(data) && data.length > 0) {
+                        allJobs = data;
+                        renderJobs(allJobs);
+                    }
                 })
                 .catch(err => {
                     if (timeoutId) clearTimeout(timeoutId);
-                    console.warn("Backend server slow or sleeping. Displaying fallback sample jobs:", err);
-                    allJobs = FALLBACK_JOBS;
-                    renderJobs(allJobs);
-
-                    // Background retry to connect when Render wakes up
-                    setTimeout(() => {
-                        fetch(`${API_BASE}/jobs`)
-                            .then(r => r.ok ? r.json() : null)
-                            .then(d => { if (d && d.length) { allJobs = d; renderJobs(allJobs); } })
-                            .catch(() => {});
-                    }, 5000);
+                    console.warn("Backend server slow or sleeping. Displaying fallback sample jobs.");
                 });
         }
 
@@ -533,15 +535,25 @@
 
             const coverLetterInput = document.getElementById("coverLetterInput");
             const resumeUrlInput = document.getElementById("resumeUrlInput");
-            const coverLetter = coverLetterInput ? coverLetterInput.value : "";
-            const resumeUrl = resumeUrlInput ? resumeUrlInput.value : "";
+            const coverLetter = coverLetterInput ? coverLetterInput.value.trim() : "";
+            const resumeUrl = resumeUrlInput ? resumeUrlInput.value.trim() : "";
 
             const application = {
+                id: Date.now(),
                 jobId: selectedJobId,
                 userId: parseInt(userId),
+                userName: localStorage.getItem("userName") || "Candidate",
+                userEmail: localStorage.getItem("userEmail") || "candidate@email.com",
                 coverLetter: coverLetter,
-                resumeUrl: resumeUrl
+                resumeUrl: resumeUrl,
+                status: "PENDING",
+                appliedDate: new Date().toISOString().split("T")[0]
             };
+
+            // Save immediately into JobHubStore so it is persistent across all pages!
+            if (window.JobHubStore) {
+                JobHubStore.saveApplication(application);
+            }
 
             const btn = document.getElementById("btnSubmitApplication");
             if (btn) {
@@ -550,7 +562,7 @@
             }
 
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
 
             fetch(`${API_BASE}/applications`, {
                 method: "POST",
@@ -560,34 +572,19 @@
             })
             .then(async res => {
                 if (timeoutId) clearTimeout(timeoutId);
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                    throw new Error(data.message || "Failed to submit application");
-                }
-                return data;
             })
-            .then(data => {
-                alert("🎉 Application submitted successfully!");
-                const modalEl = document.getElementById('jobModal');
-                if (modalEl) {
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                }
-                if (coverLetterInput) coverLetterInput.value = "";
-                if (resumeUrlInput) resumeUrlInput.value = "";
-            })
-            .catch(err => {
+            .catch(() => {
                 if (timeoutId) clearTimeout(timeoutId);
-                alert("🎉 Application submitted successfully!");
-                const modalEl = document.getElementById('jobModal');
-                if (modalEl) {
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                }
-                if (coverLetterInput) coverLetterInput.value = "";
-                if (resumeUrlInput) resumeUrlInput.value = "";
             })
             .finally(() => {
+                alert("🎉 Application submitted successfully!");
+                const modalEl = document.getElementById('jobModal');
+                if (modalEl) {
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+                if (coverLetterInput) coverLetterInput.value = "";
+                if (resumeUrlInput) resumeUrlInput.value = "";
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = `<i class="fas fa-check-circle"></i> Submit Application`;

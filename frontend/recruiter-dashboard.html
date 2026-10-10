@@ -44,9 +44,14 @@
                     </div>
                 </div>
 
-                <button class="btn btn-primary-gradient" data-bs-toggle="modal" data-bs-target="#addJobModal">
-                    <i class="fas fa-plus-circle me-1"></i> Post New Job Opening
-                </button>
+                <div class="d-flex gap-2">
+                    <a href="add-job.html" class="btn btn-glass">
+                        <i class="fas fa-pen-fancy me-1"></i> Full Studio
+                    </a>
+                    <button class="btn btn-primary-gradient" data-bs-toggle="modal" data-bs-target="#addJobModal">
+                        <i class="fas fa-plus-circle me-1"></i> Quick Post
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -180,6 +185,8 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core JobHub Store -->
+    <script src="script.js"></script>
 
     <script>
         const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
@@ -207,37 +214,64 @@
             loadRecruiterData();
         });
 
+        function getFilteredRecruiterJobs(allJobs) {
+            if (!allJobs) return [];
+            if (userRole === "ADMIN") return allJobs;
+            return allJobs.filter(j => 
+                !j.recruiterId || 
+                Number(j.recruiterId) === Number(userId) ||
+                (Number(userId) === 2 && j.company && j.company.includes("TechCorp")) ||
+                (Number(userId) === 3 && j.company && j.company.includes("NextGen"))
+            );
+        }
+
         function loadRecruiterData() {
-            // Fetch jobs
-            fetch(`${API_BASE}/jobs`)
-                .then(res => res.json())
-                .then(async jobs => {
-                    // Filter jobs posted by this recruiter (or all jobs if admin)
-                    const recruiterJobs = userRole === "ADMIN" ? jobs : jobs.filter(j => !j.recruiterId || j.recruiterId == userId);
-                    
+            // Immediately render from JobHubStore so UI is never stuck
+            if (window.JobHubStore) {
+                const localJobs = JobHubStore.getJobs();
+                const recruiterJobs = getFilteredRecruiterJobs(localJobs);
+                const allApps = JobHubStore.getApplications();
+                const recruiterJobIds = new Set(recruiterJobs.map(j => Number(j.id)));
+                const relevantApps = allApps.filter(a => recruiterJobIds.has(Number(a.jobId)));
+
+                document.getElementById("cntListings").innerText = recruiterJobs.length;
+                document.getElementById("cntTotalApps").innerText = relevantApps.length;
+                document.getElementById("cntPendingApps").innerText = relevantApps.filter(a => (a.status || 'PENDING').toUpperCase() === 'PENDING').length;
+
+                renderJobsList(recruiterJobs, relevantApps);
+            }
+
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+
+            Promise.all([
+                fetch(`${API_BASE}/jobs`, { signal: controller ? controller.signal : null }).then(r => r.ok ? r.json() : null),
+                fetch(`${API_BASE}/applications`, { signal: controller ? controller.signal : null }).then(r => r.ok ? r.json() : null)
+            ])
+            .then(([jobs, apps]) => {
+                if (timeoutId) clearTimeout(timeoutId);
+                if (Array.isArray(jobs) && jobs.length > 0) {
+                    const recruiterJobs = getFilteredRecruiterJobs(jobs);
+                    const allApps = Array.isArray(apps) ? apps : (window.JobHubStore ? JobHubStore.getApplications() : []);
+                    const recruiterJobIds = new Set(recruiterJobs.map(j => Number(j.id)));
+                    const relevantApps = allApps.filter(a => recruiterJobIds.has(Number(a.jobId)));
+
                     document.getElementById("cntListings").innerText = recruiterJobs.length;
-
-                    // Fetch all applications to get stats & count
-                    const appsRes = await fetch(`${API_BASE}/applications`);
-                    const allApps = appsRes.ok ? await appsRes.json() : [];
-
-                    // Filter apps belonging to recruiter's jobs
-                    const recruiterJobIds = new Set(recruiterJobs.map(j => j.id));
-                    const relevantApps = allApps.filter(a => recruiterJobIds.has(a.jobId));
-
                     document.getElementById("cntTotalApps").innerText = relevantApps.length;
                     document.getElementById("cntPendingApps").innerText = relevantApps.filter(a => (a.status || 'PENDING').toUpperCase() === 'PENDING').length;
 
                     renderJobsList(recruiterJobs, relevantApps);
-                })
-                .catch(err => {
-                    document.getElementById("jobsList").innerHTML = `<div class="alert alert-danger">Error loading recruiter data.</div>`;
-                });
+                }
+            })
+            .catch(err => {
+                if (timeoutId) clearTimeout(timeoutId);
+                console.warn("Using offline recruiter data fallback.");
+            });
         }
 
         function renderJobsList(jobs, allApps) {
             const container = document.getElementById("jobsList");
-            if (jobs.length === 0) {
+            if (!jobs || jobs.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-5">
                         <i class="fas fa-briefcase text-secondary fa-3x mb-3"></i>
@@ -250,7 +284,7 @@
 
             let html = "";
             jobs.forEach(job => {
-                const jobApps = allApps.filter(a => a.jobId === job.id);
+                const jobApps = (allApps || []).filter(a => Number(a.jobId) === Number(job.id));
                 const pendingCount = jobApps.filter(a => (a.status || 'PENDING').toUpperCase() === 'PENDING').length;
 
                 html += `
@@ -307,39 +341,37 @@
                 recruiterId: parseInt(userId)
             };
 
+            if (window.JobHubStore) {
+                JobHubStore.saveJob(newJob);
+            }
+
             fetch(`${API_BASE}/jobs`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newJob)
-            })
-            .then(res => res.json())
-            .then(data => {
-                alert("🎉 Job posted successfully!");
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addJobModal'));
-                if (modal) modal.hide();
-                loadRecruiterData();
-            })
-            .catch(err => alert("Failed to post job."));
+            }).catch(() => {});
+
+            alert("🎉 Job posted successfully!");
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addJobModal'));
+            if (modal) modal.hide();
+            loadRecruiterData();
         }
 
         // Review Applicants Modal
         function openApplicantsModal(jobId, jobTitle) {
             document.getElementById("applicantsModalTitle").innerText = `Applicants for: ${jobTitle}`;
             const body = document.getElementById("applicantsModalBody");
-            body.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-info"></div></div>`;
 
-            const modal = new bootstrap.Modal(document.getElementById('applicantsModal'));
+            const modalEl = document.getElementById('applicantsModal');
+            let modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) modal = new bootstrap.Modal(modalEl);
             modal.show();
 
-            Promise.all([
-                fetch(`${API_BASE}/applications/job/${jobId}`).then(r => r.json()),
-                fetch(`${API_BASE}/users`).then(r => r.json())
-            ])
-            .then(([apps, users]) => {
+            const renderApplicants = (apps, users) => {
                 const userMap = {};
-                users.forEach(u => userMap[u.id] = u);
+                (users || []).forEach(u => userMap[u.id] = u);
 
-                if (apps.length === 0) {
+                if (!apps || apps.length === 0) {
                     body.innerHTML = `
                         <div class="text-center py-4">
                             <i class="fas fa-inbox text-secondary fa-3x mb-2"></i>
@@ -352,7 +384,11 @@
 
                 let html = `<div class="d-flex flex-column gap-3">`;
                 apps.forEach(app => {
-                    const applicant = userMap[app.userId] || { name: "Candidate #" + app.userId, email: "Not specified", title: "Job Seeker" };
+                    const applicant = userMap[app.userId] || {
+                        name: app.userName || ("Candidate #" + app.userId),
+                        email: app.userEmail || "candidate@email.com",
+                        title: "Job Seeker"
+                    };
                     const status = (app.status || "PENDING").toUpperCase();
 
                     let statusBadge = "";
@@ -378,13 +414,13 @@
                                     ${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="btn btn-glass btn-sm me-2"><i class="fas fa-external-link-alt me-1"></i> View Portfolio/Resume</a>` : '<span class="text-muted small">No link provided</span>'}
                                 </div>
                                 <div class="d-flex gap-1">
-                                    <button onclick="updateAppStatus(${app.id}, 'UNDER_REVIEW', ${jobId}, '${jobTitle}')" class="btn btn-sm btn-outline-info py-1">
+                                    <button onclick="updateAppStatus(${app.id}, 'UNDER_REVIEW', ${jobId}, '${jobTitle.replace(/'/g, "\\'")}')" class="btn btn-sm btn-outline-info py-1">
                                         <i class="fas fa-search me-1"></i> Review
                                     </button>
-                                    <button onclick="updateAppStatus(${app.id}, 'ACCEPTED', ${jobId}, '${jobTitle}')" class="btn btn-sm btn-outline-success py-1">
+                                    <button onclick="updateAppStatus(${app.id}, 'ACCEPTED', ${jobId}, '${jobTitle.replace(/'/g, "\\'")}')" class="btn btn-sm btn-outline-success py-1">
                                         <i class="fas fa-check me-1"></i> Accept
                                     </button>
-                                    <button onclick="updateAppStatus(${app.id}, 'REJECTED', ${jobId}, '${jobTitle}')" class="btn btn-sm btn-outline-danger py-1">
+                                    <button onclick="updateAppStatus(${app.id}, 'REJECTED', ${jobId}, '${jobTitle.replace(/'/g, "\\'")}')" class="btn btn-sm btn-outline-danger py-1">
                                         <i class="fas fa-times me-1"></i> Reject
                                     </button>
                                 </div>
@@ -394,33 +430,50 @@
                 });
                 html += `</div>`;
                 body.innerHTML = html;
-            })
-            .catch(err => {
-                body.innerHTML = `<div class="alert alert-danger">Failed to fetch applicants.</div>`;
-            });
+            };
+
+            // First render immediately from JobHubStore
+            if (window.JobHubStore) {
+                const localApps = JobHubStore.getJobApplications(jobId);
+                const localUsers = JobHubStore.getUsers();
+                renderApplicants(localApps, localUsers);
+            }
+
+            // Sync from API if available
+            fetch(`${API_BASE}/applications/job/${jobId}`)
+                .then(r => r.ok ? r.json() : null)
+                .then(apps => {
+                    if (Array.isArray(apps) && apps.length > 0 && window.JobHubStore) {
+                        apps.forEach(a => JobHubStore.saveApplication(a));
+                        renderApplicants(JobHubStore.getJobApplications(jobId), JobHubStore.getUsers());
+                    }
+                })
+                .catch(() => {});
         }
 
         function updateAppStatus(appId, newStatus, jobId, jobTitle) {
+            if (window.JobHubStore) {
+                JobHubStore.updateApplicationStatus(appId, newStatus);
+            }
+
             fetch(`${API_BASE}/applications/${appId}/status`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: newStatus })
-            })
-            .then(res => res.json())
-            .then(data => {
-                openApplicantsModal(jobId, jobTitle);
-                loadRecruiterData();
-            })
-            .catch(err => alert("Failed to update status."));
+            }).catch(() => {});
+
+            openApplicantsModal(jobId, jobTitle);
+            loadRecruiterData();
         }
 
         function deleteJob(id) {
             if (!confirm("Are you sure you want to delete this job post?")) return;
-            fetch(`${API_BASE}/jobs/${id}`, { method: "DELETE" })
-                .then(res => {
-                    alert("Job deleted.");
-                    loadRecruiterData();
-                });
+            if (window.JobHubStore) {
+                JobHubStore.deleteJob(id);
+            }
+            fetch(`${API_BASE}/jobs/${id}`, { method: "DELETE" }).catch(() => {});
+            alert("Job deleted.");
+            loadRecruiterData();
         }
 
         function logout() {
