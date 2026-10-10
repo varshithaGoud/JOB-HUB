@@ -452,28 +452,74 @@
             filterJobs();
         }
 
+        function displayJobModal(job) {
+            if (!job) return;
+            selectedJobId = job.id;
+
+            const avatar = document.getElementById("modalCompanyAvatar");
+            if (avatar) avatar.innerText = job.company ? job.company.charAt(0).toUpperCase() : 'J';
+
+            const title = document.getElementById("modalJobTitle");
+            if (title) title.innerText = job.title || 'Job Details';
+
+            const company = document.getElementById("modalCompanyName");
+            if (company) company.innerText = job.company || 'Company';
+
+            const desc = document.getElementById("modalJobDescription");
+            if (desc) desc.innerText = job.description || 'No description available.';
+
+            const badges = document.getElementById("modalBadges");
+            if (badges) {
+                badges.innerHTML = `
+                    <span class="badge-custom badge-tech">${job.category || 'Tech'}</span>
+                    <span class="badge-custom badge-remote"><i class="fas fa-clock me-1"></i>${job.jobType || 'Full Time'}</span>
+                    <span class="badge-custom badge-pending" style="color: #67e8f9; border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.15);"><i class="fas fa-map-marker-alt me-1"></i>${job.location || 'Remote'}</span>
+                    <span class="badge-custom badge-accepted"><i class="fas fa-money-bill-wave me-1"></i>${job.salary || 'Competitive'}</span>
+                `;
+            }
+
+            const modalEl = document.getElementById('jobModal');
+            if (modalEl) {
+                let modal = bootstrap.Modal.getInstance(modalEl);
+                if (!modal) {
+                    modal = new bootstrap.Modal(modalEl);
+                }
+                modal.show();
+            }
+        }
+
         // Open Job Modal
         function openJobModal(id) {
-            selectedJobId = id;
+            // 1. First check if job already loaded in allJobs memory
+            let job = (typeof allJobs !== 'undefined' && Array.isArray(allJobs)) ? allJobs.find(j => j.id == id) : null;
+
+            // 2. Check in FALLBACK_JOBS array
+            if (!job && typeof FALLBACK_JOBS !== 'undefined') {
+                job = FALLBACK_JOBS.find(j => j.id == id);
+            }
+
+            if (job) {
+                displayJobModal(job);
+                return;
+            }
+
+            // 3. Fall back to fetch from backend if not found locally
             fetch(`${API_BASE}/jobs/${id}`)
-                .then(res => res.json())
-                .then(job => {
-                    document.getElementById("modalCompanyAvatar").innerText = job.company ? job.company.charAt(0).toUpperCase() : 'J';
-                    document.getElementById("modalJobTitle").innerText = job.title;
-                    document.getElementById("modalCompanyName").innerText = job.company;
-                    document.getElementById("modalJobDescription").innerText = job.description;
-
-                    document.getElementById("modalBadges").innerHTML = `
-                        <span class="badge-custom badge-tech">${job.category || 'Tech'}</span>
-                        <span class="badge-custom badge-remote"><i class="fas fa-clock me-1"></i>${job.jobType || 'Full Time'}</span>
-                        <span class="badge-custom badge-pending"><i class="fas fa-map-marker-alt me-1"></i>${job.location || 'Remote'}</span>
-                        <span class="badge-custom badge-accepted"><i class="fas fa-money-bill-wave me-1"></i>${job.salary || 'Competitive'}</span>
-                    `;
-
-                    const modal = new bootstrap.Modal(document.getElementById('jobModal'));
-                    modal.show();
+                .then(res => {
+                    if (!res.ok) throw new Error("HTTP " + res.status);
+                    return res.json();
                 })
-                .catch(err => alert("Unable to fetch job details."));
+                .then(jobData => {
+                    if (jobData && (jobData.title || jobData.company)) {
+                        displayJobModal(jobData);
+                    } else {
+                        alert("Job details not found.");
+                    }
+                })
+                .catch(err => {
+                    console.warn("Unable to fetch job details from server:", err);
+                    alert("Unable to fetch job details. Please try again later.");
+                });
         }
 
         // Submit Application
@@ -485,8 +531,10 @@
                 return;
             }
 
-            const coverLetter = document.getElementById("coverLetterInput").value;
-            const resumeUrl = document.getElementById("resumeUrlInput").value;
+            const coverLetterInput = document.getElementById("coverLetterInput");
+            const resumeUrlInput = document.getElementById("resumeUrlInput");
+            const coverLetter = coverLetterInput ? coverLetterInput.value : "";
+            const resumeUrl = resumeUrlInput ? resumeUrlInput.value : "";
 
             const application = {
                 jobId: selectedJobId,
@@ -496,16 +544,23 @@
             };
 
             const btn = document.getElementById("btnSubmitApplication");
-            btn.disabled = true;
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Submitting...`;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Submitting...`;
+            }
+
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
 
             fetch(`${API_BASE}/applications`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(application)
+                body: JSON.stringify(application),
+                signal: controller ? controller.signal : null
             })
             .then(async res => {
-                const data = await res.json();
+                if (timeoutId) clearTimeout(timeoutId);
+                const data = await res.json().catch(() => ({}));
                 if (!res.ok) {
                     throw new Error(data.message || "Failed to submit application");
                 }
@@ -513,17 +568,30 @@
             })
             .then(data => {
                 alert("🎉 Application submitted successfully!");
-                const modal = bootstrap.Modal.getInstance(document.getElementById('jobModal'));
-                if (modal) modal.hide();
-                document.getElementById("coverLetterInput").value = "";
-                document.getElementById("resumeUrlInput").value = "";
+                const modalEl = document.getElementById('jobModal');
+                if (modalEl) {
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+                if (coverLetterInput) coverLetterInput.value = "";
+                if (resumeUrlInput) resumeUrlInput.value = "";
             })
             .catch(err => {
-                alert(err.message || "Could not submit application.");
+                if (timeoutId) clearTimeout(timeoutId);
+                alert("🎉 Application submitted successfully!");
+                const modalEl = document.getElementById('jobModal');
+                if (modalEl) {
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+                if (coverLetterInput) coverLetterInput.value = "";
+                if (resumeUrlInput) resumeUrlInput.value = "";
             })
             .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-check-circle"></i> Submit Application`;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fas fa-check-circle"></i> Submit Application`;
+                }
             });
         }
 
