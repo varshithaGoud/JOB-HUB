@@ -3,190 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recruiter Dashboard - JobHub</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>JobHub - Recruiter Console</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        accent: '#a855f7',
+                        darkBg: '#090d16',
+                        cardBg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #090d16; }
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .btn-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+        .btn-gradient:hover { background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); }
+        .btn-amber-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .btn-amber-gradient:hover { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between text-slate-100">
 
-    <!-- Glass Navbar -->
-    <nav class="navbar navbar-expand-lg glass-nav">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-                <div class="company-avatar" style="width: 38px; height: 38px; font-size: 1.1rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+    <!-- Top Navigation -->
+    <header class="w-full glass-panel sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25">
                     <i class="fas fa-building"></i>
                 </div>
-                <span class="fs-4 fw-bold text-white">Recruiter<span style="color: #f59e0b;">Hub</span></span>
+                <span class="text-xl font-bold tracking-tight text-white">Recruiter<span class="text-amber-400">Hub</span></span>
             </a>
 
-            <div class="d-flex align-items-center gap-3">
-                <a href="index.html" class="btn btn-glass btn-sm"><i class="fas fa-globe me-1"></i> Public Job Board</a>
-                <button onclick="logout()" class="btn btn-glass btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
+            <!-- Navigation Links -->
+            <nav class="flex items-center gap-4 sm:gap-6 text-sm font-medium text-slate-300">
+                <a href="jobs.html" class="hover:text-white transition flex items-center gap-1.5">
+                    <i class="fas fa-globe text-xs"></i> Public Board
+                </a>
+                <button onclick="logout()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </nav>
         </div>
-    </nav>
+    </header>
 
     <!-- Main Container -->
-    <div class="container py-4">
-
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
         <!-- Welcome Banner -->
-        <div class="glass-card p-4 mb-4">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="company-avatar" id="recruiterAvatar" style="width: 56px; height: 56px; font-size: 1.5rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">R</div>
+        <section class="glass-panel p-6 sm:p-8 rounded-3xl mb-8 relative border border-slate-800">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div id="recruiterAvatar" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white text-xl font-extrabold shadow-lg shadow-amber-500/25">
+                        R
+                    </div>
                     <div>
-                        <h3 class="text-white mb-0" id="recruiterName">Recruiter Management Console</h3>
-                        <span class="text-warning small fw-semibold" id="recruiterEmail">Manage your active job postings & review candidate applications</span>
+                        <h1 id="recruiterName" class="text-xl sm:text-2xl font-extrabold text-white mb-0.5">Recruiter Console</h1>
+                        <p id="recruiterEmail" class="text-xs sm:text-sm text-slate-400">Manage posted roles and review candidate submissions</p>
                     </div>
                 </div>
 
-                <button class="btn btn-primary-gradient" data-bs-toggle="modal" data-bs-target="#addJobModal">
-                    <i class="fas fa-plus-circle me-1"></i> Post New Job Opening
+                <button onclick="openAddJobModal()" class="btn-amber-gradient px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md shadow-amber-500/20 transition flex items-center gap-2 self-start sm:self-auto">
+                    <i class="fas fa-plus-circle"></i> Post New Job Opening
                 </button>
             </div>
-        </div>
+        </section>
 
         <!-- Metrics Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-4">
-                <div class="glass-card p-3 text-center">
-                    <span class="text-secondary small font-semibold"><i class="fas fa-briefcase text-warning me-1"></i> Active Listings</span>
-                    <h2 class="text-white fw-bold mb-0" id="cntListings">0</h2>
-                </div>
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="glass-panel p-5 rounded-2xl border border-slate-800 text-center">
+                <span class="text-xs text-slate-400 font-medium block mb-1 flex items-center justify-center gap-1.5">
+                    <i class="fas fa-briefcase text-amber-400"></i> Active Listings
+                </span>
+                <h2 id="cntListings" class="text-3xl font-extrabold text-white">0</h2>
             </div>
-            <div class="col-md-4">
-                <div class="glass-card p-3 text-center">
-                    <span class="text-secondary small font-semibold"><i class="fas fa-users text-info me-1"></i> Total Applicants</span>
-                    <h2 class="text-info fw-bold mb-0" id="cntTotalApps">0</h2>
-                </div>
+            <div class="glass-panel p-5 rounded-2xl border border-slate-800 text-center">
+                <span class="text-xs text-slate-400 font-medium block mb-1 flex items-center justify-center gap-1.5">
+                    <i class="fas fa-users text-cyan-400"></i> Total Applicants
+                </span>
+                <h2 id="cntTotalApps" class="text-3xl font-extrabold text-cyan-400">0</h2>
             </div>
-            <div class="col-md-4">
-                <div class="glass-card p-3 text-center">
-                    <span class="text-secondary small font-semibold"><i class="fas fa-clock text-emerald me-1" style="color:#10b981;"></i> Pending Reviews</span>
-                    <h2 class="text-success fw-bold mb-0" id="cntPendingApps">0</h2>
-                </div>
+            <div class="glass-panel p-5 rounded-2xl border border-slate-800 text-center">
+                <span class="text-xs text-slate-400 font-medium block mb-1 flex items-center justify-center gap-1.5">
+                    <i class="fas fa-hourglass-half text-emerald-400"></i> Pending Reviews
+                </span>
+                <h2 id="cntPendingApps" class="text-3xl font-extrabold text-emerald-400">0</h2>
             </div>
-        </div>
+        </section>
 
-        <!-- Job Listings & Applications Table -->
-        <div class="glass-card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="text-white mb-0"><i class="fas fa-list-alt text-warning me-2"></i>My Posted Jobs</h4>
-                <button onclick="loadRecruiterData()" class="btn btn-glass btn-sm"><i class="fas fa-sync-alt me-1"></i> Refresh</button>
+        <!-- Job Listings -->
+        <section class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-list-alt text-amber-400"></i> My Posted Positions
+                </h2>
+                <button onclick="loadRecruiterData()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
             </div>
 
-            <div id="jobsList" class="d-flex flex-column gap-3">
-                <div class="text-center py-4">
-                    <div class="spinner-border text-warning"></div>
-                    <p class="text-secondary mt-2">Loading posted jobs...</p>
+            <div id="jobsList" class="space-y-4">
+                <div class="text-center py-16">
+                    <div class="inline-block animate-spin w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full mb-3"></div>
+                    <p class="text-slate-400 text-sm">Loading posted jobs...</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-    </div>
+    </main>
 
     <!-- POST NEW JOB MODAL -->
-    <div class="modal fade" id="addJobModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content modal-content-glass">
-                <div class="modal-header modal-header-glass">
-                    <h5 class="modal-title text-white"><i class="fas fa-plus-circle text-warning me-2"></i>Post New Job Listing</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <div id="addJobModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto relative border border-slate-700 shadow-2xl">
+            <button onclick="closeAddJobModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-plus-circle text-amber-400"></i> Post New Job Opening
+            </h3>
+
+            <form onsubmit="handleAddJob(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Job Title *</label>
+                        <input type="text" id="jobTitle" required placeholder="e.g. Senior Frontend Engineer"
+                            class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Company Name *</label>
+                        <input type="text" id="jobCompany" required placeholder="e.g. Innovate Corp"
+                            class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Location / Workplace *</label>
+                        <input type="text" id="jobLocation" required placeholder="e.g. Remote or Austin, TX"
+                            class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Salary Range *</label>
+                        <input type="text" id="jobSalary" required placeholder="e.g. $130,000 - $160,000"
+                            class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Job Type</label>
+                        <select id="jobType" class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+                            <option value="Full Time">Full Time</option>
+                            <option value="Part Time">Part Time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Remote">Remote</option>
+                            <option value="Internship">Internship</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Category</label>
+                        <select id="jobCategory" class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+                            <option value="Engineering">Engineering</option>
+                            <option value="Design">Design</option>
+                            <option value="Data & AI">Data & AI</option>
+                            <option value="Product">Product</option>
+                            <option value="Marketing">Marketing</option>
+                        </select>
+                    </div>
                 </div>
-                <form onsubmit="handleAddJob(event)">
-                    <div class="modal-body p-4">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label text-secondary small">Job Title *</label>
-                                <input type="text" id="jobTitle" class="form-control form-control-custom" placeholder="e.g. Senior Frontend Engineer" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-secondary small">Company Name *</label>
-                                <input type="text" id="jobCompany" class="form-control form-control-custom" placeholder="e.g. TechCorp Inc." required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-secondary small">Location / Workplace *</label>
-                                <input type="text" id="jobLocation" class="form-control form-control-custom" placeholder="e.g. Remote or San Francisco, CA" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-secondary small">Salary Range *</label>
-                                <input type="text" id="jobSalary" class="form-control form-control-custom" placeholder="e.g. $120,000 - $140,000" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label text-secondary small">Job Type</label>
-                                <select id="jobType" class="form-control form-control-custom form-select">
-                                    <option value="Full Time">Full Time</option>
-                                    <option value="Part Time">Part Time</option>
-                                    <option value="Contract">Contract</option>
-                                    <option value="Remote">Remote</option>
-                                    <option value="Internship">Internship</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label text-secondary small">Category</label>
-                                <select id="jobCategory" class="form-control form-control-custom form-select">
-                                    <option value="Engineering">Engineering</option>
-                                    <option value="Design">Design</option>
-                                    <option value="Data & AI">Data & AI</option>
-                                    <option value="Product">Product</option>
-                                    <option value="Marketing">Marketing</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label text-secondary small">Experience Level</label>
-                                <select id="jobExp" class="form-control form-control-custom form-select">
-                                    <option value="Entry Level">Entry Level</option>
-                                    <option value="Mid Level">Mid Level</option>
-                                    <option value="Senior Level">Senior Level</option>
-                                    <option value="Lead / Executive">Lead / Executive</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label text-secondary small">Detailed Job Description *</label>
-                                <textarea id="jobDescription" class="form-control form-control-custom" rows="4" placeholder="Outline position responsibilities, requirements, and benefits..." required></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer modal-footer-glass">
-                        <button type="button" class="btn btn-glass" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary-gradient"><i class="fas fa-check"></i> Publish Job Listing</button>
-                    </div>
-                </form>
-            </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Job Description *</label>
+                    <textarea id="jobDescription" rows="4" required placeholder="Outline responsibilities, required skills, and perks..."
+                        class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-amber-500"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeAddJobModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-amber-gradient px-5 py-2 rounded-xl text-xs font-bold text-white shadow-lg shadow-amber-500/25 transition">
+                        Publish Opening
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- APPLICANTS REVIEW MODAL -->
-    <div class="modal fade" id="applicantsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content modal-content-glass">
-                <div class="modal-header modal-header-glass">
-                    <div>
-                        <h5 class="modal-title text-white mb-0" id="applicantsModalTitle">Candidate Applicants</h5>
-                        <span class="text-secondary small" id="applicantsModalSub">Review and update application statuses</span>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4" id="applicantsModalBody">
-                    <div class="text-center py-4"><div class="spinner-border text-info"></div></div>
+    <div id="applicantsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+        <div class="glass-panel w-full max-w-3xl rounded-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto relative border border-slate-700 shadow-2xl">
+            <button onclick="closeApplicantsModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="mb-6">
+                <h3 id="applicantsModalTitle" class="text-xl font-bold text-white mb-0.5">Candidate Applications</h3>
+                <p id="applicantsModalSub" class="text-xs text-slate-400">Review profiles and update application statuses</p>
+            </div>
+
+            <div id="applicantsModalBody" class="space-y-4">
+                <div class="text-center py-8">
+                    <div class="inline-block animate-spin w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full mb-3"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <footer class="w-full border-t border-slate-800/80 py-8 mt-12 bg-slate-950/40">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-xs text-slate-500">
+                &copy; 2026 JobHub Platform &bull; Built with Tailwind CSS & Spring Boot. All rights reserved.
+            </p>
+        </div>
+    </footer>
 
+    <!-- Scripts -->
     <script>
-        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-            ? "http://localhost:8080/api"
+        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") 
+            ? "http://localhost:8080/api" 
             : "https://jobhub-backend.onrender.com/api";
+
         const userId = localStorage.getItem("userId");
         const userRole = localStorage.getItem("userRole");
+
+        const FALLBACK_RECRUITER_JOBS = [
+            { id: 1, title: "Senior Full Stack Engineer", company: "Google", location: "Mountain View, CA", salary: "$165,000 - $195,000", category: "Engineering", jobType: "Full Time" },
+            { id: 2, title: "Lead UI/UX Product Designer", company: "Airbnb", location: "San Francisco, CA", salary: "$140,000 - $170,000", category: "Design", jobType: "Remote" },
+            { id: 3, title: "DevOps & Cloud Architect", company: "Netflix", location: "Los Gatos, CA", salary: "$180,000 - $220,000", category: "Engineering", jobType: "Full Time" }
+        ];
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!userId) {
@@ -200,23 +250,16 @@
                 return;
             }
 
-            document.getElementById("recruiterName").innerText = localStorage.getItem("userName") || "Recruiter Console";
-            document.getElementById("recruiterEmail").innerText = localStorage.getItem("userEmail") || "Recruiter Account";
+            document.getElementById("recruiterName").innerText = (localStorage.getItem("userName") || "Recruiter") + " Console";
+            document.getElementById("recruiterEmail").innerText = localStorage.getItem("userEmail") || "recruiter@jobhub.com";
             document.getElementById("recruiterAvatar").innerText = (localStorage.getItem("userName") || 'R').charAt(0).toUpperCase();
 
             loadRecruiterData();
         });
 
-        const FALLBACK_RECRUITER_JOBS = [
-            { id: 1, title: "Senior Full-Stack Developer", company: "TechCorp Inc.", location: "Remote / San Francisco", salary: "$140,000 - $165,000", category: "Engineering", jobType: "Full Time" },
-            { id: 2, title: "UI/UX Product Designer", company: "NextGen AI", location: "San Francisco, CA", salary: "$115,000 - $135,000", category: "Design", jobType: "Full Time" },
-            { id: 3, title: "Machine Learning Researcher", company: "NextGen AI", location: "Remote", salary: "$155,000 - $185,000", category: "Data & AI", jobType: "Full Time" },
-            { id: 4, title: "DevOps & Cloud Engineer", company: "TechCorp Inc.", location: "New York, NY", salary: "$130,000 - $150,000", category: "Engineering", jobType: "Full Time" }
-        ];
-
         function loadRecruiterData() {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
 
             fetch(`${API_BASE}/jobs`, controller ? { signal: controller.signal } : {})
                 .then(res => {
@@ -224,14 +267,12 @@
                     if (!res.ok) throw new Error("HTTP " + res.status);
                     return res.json();
                 })
-                .then(async jobs => {
+                .then(jobs => {
                     const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
-                    const combinedJobs = [...jobs, ...localJobs];
-                    processRecruiterJobs(combinedJobs);
+                    processRecruiterJobs([...jobs, ...localJobs]);
                 })
-                .catch(err => {
+                .catch(() => {
                     if (timeoutId) clearTimeout(timeoutId);
-                    console.warn("Backend jobs unavailable for recruiter. Using local fallback jobs:", err);
                     const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
                     processRecruiterJobs([...FALLBACK_RECRUITER_JOBS, ...localJobs]);
                 });
@@ -242,7 +283,6 @@
             document.getElementById("cntListings").innerText = recruiterJobs.length;
 
             const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
-
             let remoteApps = [];
             try {
                 const appsRes = await fetch(`${API_BASE}/applications`);
@@ -250,8 +290,8 @@
             } catch (e) {}
 
             const appMap = {};
-            localApps.forEach(a => appMap[a.id || (a.jobId + '-' + a.userId)] = a);
-            remoteApps.forEach(a => appMap[a.id || (a.jobId + '-' + a.userId)] = a);
+            localApps.forEach(a => { appMap[a.id || (a.jobId + '-' + a.userId)] = a; });
+            remoteApps.forEach(a => { appMap[a.id || (a.jobId + '-' + a.userId)] = a; });
             const combinedApps = Object.values(appMap);
 
             const recruiterJobIds = new Set(recruiterJobs.map(j => j.id));
@@ -267,10 +307,10 @@
             const container = document.getElementById("jobsList");
             if (jobs.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="fas fa-briefcase text-secondary fa-3x mb-3"></i>
-                        <h5 class="text-white">No Jobs Posted Yet</h5>
-                        <p class="text-secondary small mb-3">Click the "Post New Job Opening" button to publish your first job listing.</p>
+                    <div class="text-center py-12">
+                        <i class="fas fa-briefcase text-slate-500 text-3xl mb-3"></i>
+                        <h4 class="text-white font-bold">No Openings Posted Yet</h4>
+                        <p class="text-slate-400 text-xs mt-1">Click "Post New Job Opening" to publish your first position.</p>
                     </div>
                 `;
                 return;
@@ -280,37 +320,41 @@
             jobs.forEach(job => {
                 const jobApps = allApps.filter(a => a.jobId === job.id);
                 const pendingCount = jobApps.filter(a => (a.status || 'PENDING').toUpperCase() === 'PENDING').length;
+                const initial = job.company ? job.company.charAt(0).toUpperCase() : 'C';
 
                 html += `
-                    <div class="glass-card p-4 animate-fade-in">
-                        <div class="row align-items-center g-3">
-                            <div class="col-md-7">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="company-avatar" style="width: 44px; height: 44px;">
-                                        ${job.company ? job.company.charAt(0).toUpperCase() : 'C'}
-                                    </div>
-                                    <div>
-                                        <h5 class="text-white mb-0 fw-bold">${job.title}</h5>
-                                        <span class="text-primary small font-semibold">${job.company}</span>
-                                        <span class="text-secondary small ms-2"><i class="fas fa-map-marker-alt me-1 text-danger"></i>${job.location}</span>
-                                    </div>
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <!-- Left Info -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
+                                    ${initial}
                                 </div>
-                                <div class="d-flex flex-wrap gap-2 mt-2">
-                                    <span class="badge-custom badge-tech">${job.category || 'Engineering'}</span>
-                                    <span class="badge-custom badge-remote">${job.jobType || 'Full Time'}</span>
-                                    <span class="badge-custom badge-pending" style="color:#67e8f9; border-color:rgba(6,182,212,0.3); background:rgba(6,182,212,0.15);">${job.salary}</span>
+                                <div>
+                                    <h3 class="text-base sm:text-lg font-bold text-white mb-0.5">${job.title}</h3>
+                                    <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                                        <span class="text-amber-400 font-semibold">${job.company}</span>
+                                        <span>&bull;</span>
+                                        <span><i class="fas fa-map-marker-alt text-rose-400 text-[10px] mr-1"></i>${job.location}</span>
+                                        <span>&bull;</span>
+                                        <span class="text-emerald-400"><i class="fas fa-dollar-sign text-[10px]"></i>${job.salary}</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 mt-2">
+                                        <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">${job.category || 'Engineering'}</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">${job.jobType || 'Full Time'}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-5 d-flex flex-column align-items-md-end gap-2">
-                                <button onclick="openApplicantsModal(${job.id}, '${job.title.replace(/'/g, "\\'")}')" class="btn btn-primary-gradient btn-sm w-100 w-md-auto">
-                                    <i class="fas fa-users me-1"></i> Review Applicants (${jobApps.length})
-                                    ${pendingCount > 0 ? `<span class="badge bg-warning text-dark ms-1">${pendingCount} new</span>` : ''}
+
+                            <!-- Right Actions -->
+                            <div class="flex flex-row md:flex-col md:items-end justify-between items-center gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800">
+                                <button onclick="openApplicantsModal(${job.id}, '${job.title.replace(/'/g, "\\'")}')" class="btn-amber-gradient px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md shadow-amber-500/20 transition flex items-center gap-1.5">
+                                    <i class="fas fa-users"></i> Review Candidates (${jobApps.length})
+                                    ${pendingCount > 0 ? `<span class="bg-white text-amber-600 text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ml-1">${pendingCount} new</span>` : ''}
                                 </button>
-                                <div class="d-flex gap-2">
-                                    <button onclick="deleteJob(${job.id})" class="btn btn-outline-danger btn-sm">
-                                        <i class="fas fa-trash-alt me-1"></i> Delete Listing
-                                    </button>
-                                </div>
+                                <button onclick="deleteJob(${job.id})" class="text-xs text-rose-400 hover:text-rose-300 font-medium px-2 py-1 rounded hover:bg-rose-500/10 transition flex items-center gap-1">
+                                    <i class="fas fa-trash-alt text-[10px]"></i> Delete Opening
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -320,7 +364,7 @@
             container.innerHTML = html;
         }
 
-        // Post Job Handler
+        // Post Job
         function handleAddJob(e) {
             e.preventDefault();
             const newJob = {
@@ -331,7 +375,6 @@
                 salary: document.getElementById("jobSalary").value.trim(),
                 jobType: document.getElementById("jobType").value,
                 category: document.getElementById("jobCategory").value,
-                experienceLevel: document.getElementById("jobExp").value,
                 description: document.getElementById("jobDescription").value.trim(),
                 recruiterId: parseInt(userId)
             };
@@ -340,95 +383,104 @@
             localJobs.push(newJob);
             localStorage.setItem("local_jobs", JSON.stringify(localJobs));
 
-            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
-
             fetch(`${API_BASE}/jobs`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newJob),
-                signal: controller ? controller.signal : null
-            })
-            .then(res => res.json())
-            .catch(err => {
-                console.warn("Backend unavailable, job published locally:", err);
-            })
-            .finally(() => {
-                if (timeoutId) clearTimeout(timeoutId);
-                alert("🎉 Job posted successfully!");
-                const modalEl = document.getElementById('addJobModal');
-                if (modalEl) {
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                }
-                loadRecruiterData();
-            });
+                body: JSON.stringify(newJob)
+            }).catch(() => {});
+
+            alert("Position successfully published!");
+            closeAddJobModal();
+            loadRecruiterData();
         }
 
-        // Review Applicants Modal
+        // Modals
+        function openAddJobModal() {
+            document.getElementById("addJobModal").classList.remove("hidden");
+        }
+        function closeAddJobModal() {
+            document.getElementById("addJobModal").classList.add("hidden");
+        }
+
         function openApplicantsModal(jobId, jobTitle) {
             document.getElementById("applicantsModalTitle").innerText = `Applicants for: ${jobTitle}`;
             const body = document.getElementById("applicantsModalBody");
-            body.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-info"></div></div>`;
+            body.innerHTML = `<div class="text-center py-8"><div class="inline-block animate-spin w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full mb-3"></div></div>`;
+            document.getElementById("applicantsModal").classList.remove("hidden");
 
-            const modal = new bootstrap.Modal(document.getElementById('applicantsModal'));
-            modal.show();
+            const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+            const matchingLocalApps = localApps.filter(a => a.jobId == jobId);
 
             Promise.all([
-                fetch(`${API_BASE}/applications/job/${jobId}`).then(r => r.json()),
-                fetch(`${API_BASE}/users`).then(r => r.json())
+                fetch(`${API_BASE}/applications/job/${jobId}`).then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch(`${API_BASE}/users`).then(r => r.ok ? r.json() : []).catch(() => [])
             ])
-            .then(([apps, users]) => {
+            .then(([remoteApps, users]) => {
                 const userMap = {};
                 users.forEach(u => userMap[u.id] = u);
 
+                const appMap = {};
+                matchingLocalApps.forEach(a => { appMap[a.id || (a.jobId + '-' + a.userId)] = a; });
+                remoteApps.forEach(a => { appMap[a.id || (a.jobId + '-' + a.userId)] = a; });
+                const apps = Object.values(appMap);
+
                 if (apps.length === 0) {
                     body.innerHTML = `
-                        <div class="text-center py-4">
-                            <i class="fas fa-inbox text-secondary fa-3x mb-2"></i>
-                            <h6 class="text-white">No applications submitted yet</h6>
-                            <p class="text-secondary small">Candidates will appear here once they apply.</p>
+                        <div class="text-center py-8">
+                            <i class="fas fa-inbox text-slate-500 text-3xl mb-2"></i>
+                            <h4 class="text-white font-bold">No applications submitted yet</h4>
+                            <p class="text-slate-400 text-xs">Candidates will appear here once they apply.</p>
                         </div>
                     `;
                     return;
                 }
 
-                let html = `<div class="d-flex flex-column gap-3">`;
+                let html = `<div class="space-y-3">`;
                 apps.forEach(app => {
-                    const applicant = userMap[app.userId] || { name: "Candidate #" + app.userId, email: "Not specified", title: "Job Seeker" };
+                    const applicant = userMap[app.userId] || { 
+                        name: app.applicantName || "Candidate #" + (app.userId || "101"), 
+                        email: app.applicantEmail || "applicant@jobhub.com" 
+                    };
                     const status = (app.status || "PENDING").toUpperCase();
 
-                    let statusBadge = "";
-                    if (status === "ACCEPTED") statusBadge = `<span class="badge-custom badge-accepted">Accepted</span>`;
-                    else if (status === "REJECTED") statusBadge = `<span class="badge-custom badge-rejected">Rejected</span>`;
-                    else if (status === "UNDER_REVIEW") statusBadge = `<span class="badge-custom badge-reviewing">Under Review</span>`;
-                    else statusBadge = `<span class="badge-custom badge-pending">Pending</span>`;
+                    let badgeColor = "bg-amber-500/10 text-amber-300 border-amber-500/20";
+                    if (status === "ACCEPTED") badgeColor = "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
+                    else if (status === "REJECTED") badgeColor = "bg-rose-500/10 text-rose-300 border-rose-500/20";
+                    else if (status === "UNDER_REVIEW") badgeColor = "bg-blue-500/10 text-blue-300 border-blue-500/20";
 
                     html += `
-                        <div class="glass-card p-3 border-secondary">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <h6 class="text-white mb-0 fw-bold"><i class="fas fa-user-circle text-primary me-1"></i>${applicant.name}</h6>
-                                    <span class="text-secondary small">${applicant.email} • ${applicant.title || 'Applicant'}</span>
+                                    <h4 class="text-white font-bold text-sm">${applicant.name}</h4>
+                                    <span class="text-xs text-slate-400">${applicant.email}</span>
                                 </div>
-                                <div>${statusBadge}</div>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full border ${badgeColor} font-semibold">${status}</span>
                             </div>
 
-                            ${app.coverLetter ? `<div class="bg-dark p-2 rounded mb-2 text-slate-300 small border border-secondary" style="font-style: italic;">"${app.coverLetter}"</div>` : ''}
-
-                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 border-top border-secondary">
-                                <div>
-                                    ${app.resumeUrl ? `<a href="${app.resumeUrl}" target="_blank" class="btn btn-glass btn-sm me-2"><i class="fas fa-external-link-alt me-1"></i> View Portfolio/Resume</a>` : '<span class="text-muted small">No link provided</span>'}
+                            ${app.coverLetter ? `
+                                <div class="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 text-xs text-slate-300 italic mb-3">
+                                    "${app.coverLetter}"
                                 </div>
-                                <div class="d-flex gap-1">
-                                    <button onclick="updateAppStatus(${app.id}, 'UNDER_REVIEW', ${jobId}, '${jobTitle}')" class="btn btn-sm btn-outline-info py-1">
-                                        <i class="fas fa-search me-1"></i> Review
+                            ` : ''}
+
+                            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800">
+                                <div>
+                                    ${app.resumeUrl ? `
+                                        <a href="${app.resumeUrl}" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium">
+                                            <i class="fas fa-external-link-alt text-[10px]"></i> View Resume / Portfolio
+                                        </a>
+                                    ` : '<span class="text-slate-500 text-[11px]">No link provided</span>'}
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="updateAppStatus(${app.id}, 'UNDER_REVIEW', ${jobId}, '${jobTitle}')" class="text-[11px] px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 border border-blue-500/20 font-medium">
+                                        Review
                                     </button>
-                                    <button onclick="updateAppStatus(${app.id}, 'ACCEPTED', ${jobId}, '${jobTitle}')" class="btn btn-sm btn-outline-success py-1">
-                                        <i class="fas fa-check me-1"></i> Accept
+                                    <button onclick="updateAppStatus(${app.id}, 'ACCEPTED', ${jobId}, '${jobTitle}')" class="text-[11px] px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/20 font-medium">
+                                        Accept
                                     </button>
-                                    <button onclick="updateAppStatus(${app.id}, 'REJECTED', ${jobId}, '${jobTitle}')" class="btn btn-sm btn-outline-danger py-1">
-                                        <i class="fas fa-times me-1"></i> Reject
+                                    <button onclick="updateAppStatus(${app.id}, 'REJECTED', ${jobId}, '${jobTitle}')" class="text-[11px] px-2.5 py-1 rounded bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 border border-rose-500/20 font-medium">
+                                        Reject
                                     </button>
                                 </div>
                             </div>
@@ -437,38 +489,50 @@
                 });
                 html += `</div>`;
                 body.innerHTML = html;
-            })
-            .catch(err => {
-                body.innerHTML = `<div class="alert alert-danger">Failed to fetch applicants.</div>`;
             });
         }
 
+        function closeApplicantsModal() {
+            document.getElementById("applicantsModal").classList.add("hidden");
+        }
+
         function updateAppStatus(appId, newStatus, jobId, jobTitle) {
+            // Update local storage
+            const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+            const idx = localApps.findIndex(a => a.id == appId);
+            if (idx >= 0) {
+                localApps[idx].status = newStatus;
+                localStorage.setItem("local_applications", JSON.stringify(localApps));
+            }
+
             fetch(`${API_BASE}/applications/${appId}/status`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: newStatus })
-            })
-            .then(res => res.json())
-            .then(data => {
-                openApplicantsModal(jobId, jobTitle);
-                loadRecruiterData();
-            })
-            .catch(err => alert("Failed to update status."));
+            }).catch(() => {});
+
+            openApplicantsModal(jobId, jobTitle);
+            loadRecruiterData();
         }
 
         function deleteJob(id) {
-            if (!confirm("Are you sure you want to delete this job post?")) return;
-            fetch(`${API_BASE}/jobs/${id}`, { method: "DELETE" })
-                .then(res => {
-                    alert("Job deleted.");
-                    loadRecruiterData();
-                });
+            if (!confirm("Are you sure you want to delete this job listing?")) return;
+
+            const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
+            const updated = localJobs.filter(j => j.id != id);
+            localStorage.setItem("local_jobs", JSON.stringify(updated));
+
+            fetch(`${API_BASE}/jobs/${id}`, { method: "DELETE" }).catch(() => {});
+            alert("Job removed.");
+            loadRecruiterData();
         }
 
         function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userName");
+            localStorage.removeItem("userRole");
+            window.location.href = "login.html";
         }
     </script>
 </body>

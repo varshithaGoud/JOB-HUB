@@ -4,197 +4,243 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobHub - Find Your Dream Career</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        accent: '#a855f7',
+                        darkBg: '#090d16',
+                        cardBg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom Design System -->
-    <link href="style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #090d16; }
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .btn-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+        .btn-gradient:hover { background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); }
+        .filter-pill.active { background: #6366f1; color: white; border-color: #6366f1; }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between text-slate-100">
 
-    <!-- Demo Role Switcher Top Bar -->
-    <div class="bg-dark text-white py-2 px-3 border-bottom border-secondary text-center small" style="background: rgba(15, 23, 42, 0.95) !important;">
-        <span class="text-secondary me-2"><i class="fas fa-bolt text-warning me-1"></i> Quick Demo Login:</span>
-        <button onclick="quickLogin('alex@seeker.com', 'seeker123')" class="btn btn-sm btn-outline-info py-0 px-2 me-1">Candidate (Alex)</button>
-        <button onclick="quickLogin('techcorp@jobs.com', 'recruiter123')" class="btn btn-sm btn-outline-warning py-0 px-2 me-1">Recruiter (Sarah)</button>
-        <button onclick="quickLogin('admin@jobhub.com', 'admin123')" class="btn btn-sm btn-outline-danger py-0 px-2">Admin</button>
-    </div>
-
-    <!-- Glass Navbar -->
-    <nav class="navbar navbar-expand-lg glass-nav">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-                <div class="company-avatar" style="width: 38px; height: 38px; font-size: 1.1rem;">
+    <!-- Top Navigation -->
+    <header class="w-full glass-panel sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
                     <i class="fas fa-briefcase"></i>
                 </div>
-                <span class="fs-4 fw-bold text-white">Job<span style="color: var(--primary);">Hub</span></span>
+                <span class="text-xl font-bold tracking-tight text-white">Job<span class="text-indigo-400">Hub</span></span>
             </a>
 
-            <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <i class="fas fa-bars"></i>
-            </button>
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+                <a href="index.html" class="text-indigo-400 hover:text-white transition flex items-center gap-1.5">
+                    <i class="fas fa-search text-xs"></i> Browse Jobs
+                </a>
+                <a id="navMyApps" href="my-applications.html" class="hidden hover:text-white transition items-center gap-1.5">
+                    <i class="fas fa-file-alt text-xs"></i> My Applications
+                </a>
+                <a id="navRecruiter" href="recruiter-dashboard.html" class="hidden hover:text-white transition items-center gap-1.5 text-amber-400">
+                    <i class="fas fa-building text-xs"></i> Recruiter Console
+                </a>
+                <a id="navAdmin" href="admin-dashboard.html" class="hidden hover:text-white transition items-center gap-1.5 text-rose-400">
+                    <i class="fas fa-shield-alt text-xs"></i> Admin Panel
+                </a>
+            </nav>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto ms-lg-4">
-                    <li class="nav-item">
-                        <a class="nav-link text-white fw-semibold active" href="index.html"><i class="fas fa-compass me-1 text-primary"></i> Explore Jobs</a>
-                    </li>
-                    <li class="nav-item" id="navMyApps" style="display: none;">
-                        <a class="nav-link text-secondary fw-semibold" href="my-applications.html"><i class="fas fa-file-invoice me-1 text-info"></i> My Applications</a>
-                    </li>
-                    <li class="nav-item" id="navRecruiter" style="display: none;">
-                        <a class="nav-link text-secondary fw-semibold" href="recruiter-dashboard.html"><i class="fas fa-building me-1 text-warning"></i> Recruiter Hub</a>
-                    </li>
-                    <li class="nav-item" id="navAdmin" style="display: none;">
-                        <a class="nav-link text-secondary fw-semibold" href="admin-dashboard.html"><i class="fas fa-user-shield me-1 text-danger"></i> Admin Console</a>
-                    </li>
-                </ul>
-
-                <div class="d-flex align-items-center gap-3" id="authButtons">
-                    <!-- Dynamic Auth State rendered via JS -->
-                </div>
+            <!-- Auth Buttons Container -->
+            <div id="authButtons" class="flex items-center gap-3">
+                <a href="login.html" class="text-sm font-semibold px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    Sign In
+                </a>
+                <a href="register.html" class="text-sm font-semibold px-4 py-2 rounded-lg btn-gradient text-white shadow-md shadow-indigo-500/20 transition">
+                    Register
+                </a>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <div class="badge-custom badge-tech mb-3 mx-auto">
-                <i class="fas fa-sparkles me-1"></i> Over 5,000+ Top Companies Hiring
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- Hero Header -->
+        <section class="text-center py-10 md:py-14 relative">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-4">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Over 1,200+ Verified Opportunities Live</span>
             </div>
-            <h1 class="hero-title">Discover Your Next <span>Dream Career</span></h1>
-            <p class="hero-subtitle">Connect with high-growth startups and tech giants. Explore engineering, design, AI, and leadership opportunities tailored for you.</p>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-4">
+                Discover Your Dream Career in <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Tech & Beyond</span>
+            </h1>
+            <p class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto mb-8">
+                Connect directly with forward-thinking tech companies, startups, and enterprise teams hiring today.
+            </p>
 
-            <!-- Search & Filter Bar -->
-            <div class="glass-card p-3 max-w-4xl mx-auto shadow-lg" style="max-width: 850px;">
-                <div class="row g-2">
-                    <div class="col-md-5">
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent border-0 text-secondary"><i class="fas fa-search"></i></span>
-                            <input type="text" id="searchInput" class="form-control form-control-custom border-0 ps-0" placeholder="Job title, keywords, or company..." onkeyup="filterJobs()">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent border-0 text-secondary"><i class="fas fa-map-marker-alt"></i></span>
-                            <input type="text" id="locationInput" class="form-control form-control-custom border-0 ps-0" placeholder="Location or Remote" onkeyup="filterJobs()">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <button onclick="filterJobs()" class="btn btn-primary-gradient w-100 h-100">
-                            Search Jobs
-                        </button>
-                    </div>
+            <!-- Search Bar Panel -->
+            <div class="glass-panel p-3 rounded-2xl shadow-xl max-w-4xl mx-auto flex flex-col md:flex-row gap-2.5 items-center">
+                <div class="flex-1 flex items-center gap-3 px-3 py-2 bg-slate-900/80 rounded-xl border border-slate-800 w-full">
+                    <i class="fas fa-search text-indigo-400"></i>
+                    <input type="text" id="searchInput" oninput="filterJobs()" placeholder="Job title, keywords, or company..."
+                        class="bg-transparent w-full text-white placeholder-slate-500 text-sm focus:outline-none">
                 </div>
+                <div class="flex-1 flex items-center gap-3 px-3 py-2 bg-slate-900/80 rounded-xl border border-slate-800 w-full">
+                    <i class="fas fa-map-marker-alt text-rose-400"></i>
+                    <input type="text" id="locationInput" oninput="filterJobs()" placeholder="City or 'Remote'..."
+                        class="bg-transparent w-full text-white placeholder-slate-500 text-sm focus:outline-none">
+                </div>
+                <div class="w-full md:w-48 px-3 py-2 bg-slate-900/80 rounded-xl border border-slate-800">
+                    <select id="typeFilter" onchange="filterJobs()" class="bg-transparent text-white text-sm w-full focus:outline-none">
+                        <option value="" class="bg-slate-900 text-white">All Job Types</option>
+                        <option value="Full Time" class="bg-slate-900 text-white">Full Time</option>
+                        <option value="Part Time" class="bg-slate-900 text-white">Part Time</option>
+                        <option value="Contract" class="bg-slate-900 text-white">Contract</option>
+                        <option value="Remote" class="bg-slate-900 text-white">Remote</option>
+                    </select>
+                </div>
+                <button onclick="filterJobs()" class="btn-gradient w-full md:w-auto px-6 py-2.5 rounded-xl text-white font-semibold text-sm transition flex items-center justify-center gap-2">
+                    <i class="fas fa-filter"></i> Search
+                </button>
             </div>
 
-            <!-- Category Pills -->
-            <div class="d-flex flex-wrap justify-content-center gap-2 mt-4" id="categoryPills">
-                <button onclick="selectCategory('')" class="filter-pill active" data-cat="">All Categories</button>
-                <button onclick="selectCategory('Engineering')" class="filter-pill" data-cat="Engineering"><i class="fas fa-code me-1"></i> Engineering</button>
-                <button onclick="selectCategory('Design')" class="filter-pill" data-cat="Design"><i class="fas fa-paint-brush me-1"></i> Design</button>
-                <button onclick="selectCategory('Data & AI')" class="filter-pill" data-cat="Data & AI"><i class="fas fa-brain me-1"></i> Data & AI</button>
-                <button onclick="selectCategory('Product')" class="filter-pill" data-cat="Product"><i class="fas fa-rocket me-1"></i> Product</button>
+            <!-- Category Filter Pills -->
+            <div id="categoryPills" class="flex flex-wrap items-center justify-center gap-2 mt-6">
+                <button onclick="selectCategory('')" class="filter-pill active px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-indigo-500 transition">
+                    All Categories
+                </button>
+                <button onclick="selectCategory('Engineering')" class="filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-indigo-500 transition">
+                    💻 Engineering
+                </button>
+                <button onclick="selectCategory('Design')" class="filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-indigo-500 transition">
+                    🎨 Design
+                </button>
+                <button onclick="selectCategory('Data & AI')" class="filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-indigo-500 transition">
+                    🤖 Data & AI
+                </button>
+                <button onclick="selectCategory('Product')" class="filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 border border-slate-700 hover:border-indigo-500 transition">
+                    🚀 Product
+                </button>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Main Content Grid -->
-    <main class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Featured Openings Header -->
+        <div class="flex items-center justify-between mb-6 pt-4 border-t border-slate-800/80">
             <div>
-                <h3 class="mb-1 text-white">Featured Openings</h3>
-                <p class="text-secondary small mb-0" id="jobCountText">Loading latest opportunities...</p>
-            </div>
-            <div class="d-flex gap-2">
-                <select id="typeFilter" class="form-control form-control-custom form-select" style="width: 170px;" onchange="filterJobs()">
-                    <option value="">All Job Types</option>
-                    <option value="Full Time">Full Time</option>
-                    <option value="Part Time">Part Time</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Remote">Remote</option>
-                </select>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Featured Openings</h2>
+                <p id="jobCountText" class="text-xs text-slate-400 mt-0.5">Showing active positions</p>
             </div>
         </div>
 
-        <!-- Jobs Container -->
-        <div id="jobsContainer" class="row g-4">
-            <div class="col-12 text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading jobs...</span>
-                </div>
-                <p class="text-secondary mt-3">Fetching available jobs from server...</p>
-            </div>
+        <!-- Job Cards Grid Container (0ms Instant Loading) -->
+        <div id="jobsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards populated dynamically by renderJobs() -->
         </div>
+
     </main>
 
-    <!-- Job Details & Apply Modal -->
-    <div class="modal fade" id="jobModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content modal-content-glass">
-                <div class="modal-header modal-header-glass">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="company-avatar" id="modalCompanyAvatar">TC</div>
-                        <div>
-                            <h4 class="modal-title text-white mb-0" id="modalJobTitle">Job Title</h4>
-                            <span class="text-primary fw-semibold" id="modalCompanyName">Company Name</span>
-                        </div>
+    <!-- Tailwind Modal: Job Details & Application -->
+    <div id="jobModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-700 overflow-hidden relative max-h-[90vh] flex flex-col">
+            
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-slate-800 flex items-start justify-between">
+                <div class="flex items-center gap-4">
+                    <div id="modalCompanyAvatar" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                        J
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div>
+                        <h3 id="modalJobTitle" class="text-xl font-bold text-white leading-tight">Job Title</h3>
+                        <span id="modalCompanyName" class="text-sm font-semibold text-indigo-400">Company Name</span>
+                    </div>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="d-flex flex-wrap gap-2 mb-4" id="modalBadges">
-                        <!-- Badges dynamically added -->
-                    </div>
-                    
-                    <h6 class="text-secondary uppercase tracking-wider text-xs font-bold mb-2">Position Description</h6>
-                    <div class="p-3 glass-card mb-4 text-slate-300" id="modalJobDescription">
+                <button onclick="closeJobModal()" class="text-slate-400 hover:text-white p-1 text-lg transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto space-y-4 flex-1">
+                <div id="modalBadges" class="flex flex-wrap gap-2">
+                    <!-- Badges rendered here -->
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Position Description</h4>
+                    <div id="modalJobDescription" class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 text-sm leading-relaxed whitespace-pre-line">
                         Job description details...
                     </div>
+                </div>
 
-                    <!-- Application Form -->
-                    <div id="applyFormSection">
-                        <h6 class="text-white font-bold mb-3"><i class="fas fa-paper-plane text-primary me-2"></i>Apply for this position</h6>
-                        <div class="mb-3">
-                            <label class="form-label text-secondary small">Cover Letter / Pitch</label>
-                            <textarea id="coverLetterInput" class="form-control form-control-custom" rows="3" placeholder="Tell the recruiter why you are a great fit for this role..."></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-secondary small">Portfolio / GitHub / Resume Link</label>
-                            <input type="url" id="resumeUrlInput" class="form-control form-control-custom" placeholder="https://github.com/username or LinkedIn link">
-                        </div>
+                <!-- Application Inputs -->
+                <div class="pt-2 border-t border-slate-800 space-y-3">
+                    <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-paper-plane text-indigo-400"></i> Submit Your Application
+                    </h4>
+                    <div>
+                        <label for="coverLetterInput" class="block text-xs font-medium text-slate-400 mb-1">Cover Note / Intro</label>
+                        <textarea id="coverLetterInput" rows="3" placeholder="Briefly introduce yourself and why you're a great fit..."
+                            class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:border-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <label for="resumeUrlInput" class="block text-xs font-medium text-slate-400 mb-1">Portfolio / LinkedIn / Resume Link</label>
+                        <input type="url" id="resumeUrlInput" placeholder="https://linkedin.com/in/... or GitHub link"
+                            class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
-                <div class="modal-footer modal-footer-glass">
-                    <button type="button" class="btn btn-glass" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary-gradient" id="btnSubmitApplication" onclick="submitApplication()">
-                        <i class="fas fa-check-circle"></i> Submit Application
-                    </button>
-                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex items-center justify-end gap-3">
+                <button onclick="closeJobModal()" class="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                    Close
+                </button>
+                <button onclick="submitApplication()" id="btnSubmitApplication" class="btn-gradient px-6 py-2 rounded-xl text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i> Submit Application
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="mt-5 py-4 text-center text-secondary border-top border-secondary small" style="background: rgba(9, 13, 22, 0.9);">
-        <div class="container">
-            <p class="mb-0">&copy; 2026 JobHub Platform. All rights reserved. Connecting Talent with Opportunities.</p>
+    <footer class="w-full py-6 text-center text-xs text-slate-500 border-t border-slate-800/80 mt-12 bg-slate-950/80">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p>&copy; 2026 JobHub Platform. All rights reserved. Connecting Talent with Opportunities.</p>
+            <div class="flex gap-4">
+                <a href="login.html" class="hover:text-slate-300 transition">Sign In</a>
+                <a href="register.html" class="hover:text-slate-300 transition">Register</a>
+                <a href="jobs.html" class="hover:text-slate-300 transition">All Jobs</a>
+            </div>
         </div>
     </footer>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core App JS -->
+    <!-- App Logic Script -->
     <script>
         const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
             ? "http://localhost:8080/api"
             : "https://jobhub-backend.onrender.com/api";
+
         let allJobs = [];
         let activeCategory = "";
         let selectedJobId = null;
+
+        const FALLBACK_JOBS = [
+            { id: 1, title: "Senior Full-Stack Developer", company: "TechCorp Inc.", location: "Remote / San Francisco", salary: "$140,000 - $165,000", jobType: "Full Time", category: "Engineering", postedDate: "2026-10-09", description: "Lead architectural decisions across core cloud platforms. Work closely with backend Java/Spring Boot microservices and modern reactive frontends." },
+            { id: 2, title: "UI/UX Product Designer", company: "NextGen AI", location: "San Francisco, CA", salary: "$115,000 - $135,000", jobType: "Full Time", category: "Design", postedDate: "2026-10-09", description: "Craft beautiful visual interfaces, design systems, and micro-interactions for generative AI suites." },
+            { id: 3, title: "Machine Learning Researcher", company: "NextGen AI", location: "Remote", salary: "$155,000 - $185,000", jobType: "Full Time", category: "Data & AI", postedDate: "2026-10-09", description: "Train and fine-tune large language models and neural architectures for specialized enterprise applications." },
+            { id: 4, title: "DevOps & Cloud Engineer", company: "TechCorp Inc.", location: "New York, NY", salary: "$130,000 - $150,000", jobType: "Full Time", category: "Engineering", postedDate: "2026-10-09", description: "Build scalable Kubernetes clusters, Automated CI/CD pipelines, and maintain high-availability cloud infrastructure on AWS." },
+            { id: 5, title: "Technical Product Manager", company: "InnovateLabs", location: "Hybrid (Chicago, IL)", salary: "$120,000 - $140,000", jobType: "Full Time", category: "Product", postedDate: "2026-10-09", description: "Drive product vision, roadmap, and cross-functional team execution for enterprise SaaS platform solutions." },
+            { id: 6, title: "Frontend React Specialist", company: "CloudScale Technologies", location: "Remote", salary: "$100,000 - $120,000", jobType: "Full Time", category: "Engineering", postedDate: "2026-10-09", description: "Create responsive, high-performance web dashboards and interactive visualizations using modern React & JavaScript ecosystem." }
+        ];
 
         document.addEventListener("DOMContentLoaded", () => {
             checkAuth();
@@ -213,122 +259,46 @@
             const navAdmin = document.getElementById("navAdmin");
 
             if (userId) {
-                // Show role-specific nav items
-                if (userRole === "JOB_SEEKER") {
-                    if (navMyApps) navMyApps.style.display = "block";
-                } else if (userRole === "RECRUITER") {
-                    if (navRecruiter) navRecruiter.style.display = "block";
-                } else if (userRole === "ADMIN") {
-                    if (navAdmin) navAdmin.style.display = "block";
-                }
+                if (userRole === "JOB_SEEKER" && navMyApps) navMyApps.classList.remove("hidden"), navMyApps.classList.add("flex");
+                if (userRole === "RECRUITER" && navRecruiter) navRecruiter.classList.remove("hidden"), navRecruiter.classList.add("flex");
+                if (userRole === "ADMIN" && navAdmin) navAdmin.classList.remove("hidden"), navAdmin.classList.add("flex");
 
-                let roleBadgeClass = userRole === 'ADMIN' ? 'bg-danger' : (userRole === 'RECRUITER' ? 'bg-warning text-dark' : 'bg-primary');
+                let roleBadgeColor = userRole === 'ADMIN' ? 'bg-rose-500/20 text-rose-300 border-rose-500/30' : (userRole === 'RECRUITER' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30');
 
                 authContainer.innerHTML = `
-                    <div class="d-flex align-items-center gap-2 me-2">
-                        <div class="company-avatar" style="width: 34px; height: 34px; font-size: 0.9rem;">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
                             ${userName ? userName.charAt(0).toUpperCase() : 'U'}
                         </div>
-                        <div class="d-none d-md-block text-start">
-                            <div class="text-white fw-semibold small leading-none">${userName}</div>
-                            <span class="badge ${roleBadgeClass} mt-1" style="font-size: 0.65rem;">${userRole}</span>
+                        <div class="hidden sm:block text-left">
+                            <p class="text-xs font-bold text-white leading-none">${userName}</p>
+                            <span class="inline-block text-[10px] px-1.5 py-0.5 rounded border mt-0.5 ${roleBadgeColor}">${userRole}</span>
                         </div>
                     </div>
-                    <button onclick="logout()" class="btn btn-glass btn-sm">
+                    <button onclick="logout()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 `;
             } else {
                 authContainer.innerHTML = `
-                    <a href="login.html" class="btn btn-glass btn-sm">Sign In</a>
-                    <a href="register.html" class="btn btn-primary-gradient btn-sm">Register</a>
+                    <a href="login.html" class="text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                        Sign In
+                    </a>
+                    <a href="register.html" class="text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-lg btn-gradient text-white shadow-md shadow-indigo-500/20 transition">
+                        Register
+                    </a>
                 `;
             }
         }
 
-        const FALLBACK_JOBS = [
-            {
-                id: 1,
-                title: "Senior Full-Stack Developer",
-                company: "TechCorp Inc.",
-                location: "Remote / San Francisco",
-                salary: "$140,000 - $165,000",
-                jobType: "Full Time",
-                category: "Engineering",
-                experienceLevel: "Senior Level",
-                description: "We are looking for a Senior Full-Stack Developer to lead architectural decisions across our core cloud platforms. You will work closely with backend Java/Spring Boot microservices and modern reactive frontends.",
-                postedDate: "2026-10-09"
-            },
-            {
-                id: 2,
-                title: "UI/UX Product Designer",
-                company: "NextGen AI",
-                location: "San Francisco, CA",
-                salary: "$115,000 - $135,000",
-                jobType: "Full Time",
-                category: "Design",
-                experienceLevel: "Mid Level",
-                description: "Join our design team to craft beautiful visual interfaces, design systems, and micro-interactions for our generative AI suite.",
-                postedDate: "2026-10-09"
-            },
-            {
-                id: 3,
-                title: "Machine Learning Researcher",
-                company: "NextGen AI",
-                location: "Remote",
-                salary: "$155,000 - $185,000",
-                jobType: "Full Time",
-                category: "Data & AI",
-                experienceLevel: "Senior Level",
-                description: "Opportunity to train and fine-tune large language models and neural architectures for specialized enterprise applications.",
-                postedDate: "2026-10-09"
-            },
-            {
-                id: 4,
-                title: "DevOps & Cloud Engineer",
-                company: "TechCorp Inc.",
-                location: "New York, NY",
-                salary: "$130,000 - $150,000",
-                jobType: "Full Time",
-                category: "Engineering",
-                experienceLevel: "Mid Level",
-                description: "Build scalable Kubernetes clusters, Automated CI/CD pipelines, and maintain high-availability cloud infrastructure on AWS.",
-                postedDate: "2026-10-09"
-            },
-            {
-                id: 5,
-                title: "Technical Product Manager",
-                company: "InnovateLabs",
-                location: "Hybrid (Chicago, IL)",
-                salary: "$120,000 - $140,000",
-                jobType: "Full Time",
-                category: "Product",
-                experienceLevel: "Senior Level",
-                description: "Drive product vision, roadmap, and cross-functional team execution for enterprise SaaS platform solutions.",
-                postedDate: "2026-10-09"
-            },
-            {
-                id: 6,
-                title: "Frontend React Specialist",
-                company: "CloudScale Technologies",
-                location: "Remote",
-                salary: "$100,000 - $120,000",
-                jobType: "Full Time",
-                category: "Engineering",
-                experienceLevel: "Mid Level",
-                description: "Create responsive, high-performance web dashboards and interactive visualizations using modern React & JavaScript ecosystem.",
-                postedDate: "2026-10-09"
-            }
-        ];
-
-        // Fetch all jobs
+        // 0ms Instant Loading & Silent Background Sync
         function loadJobs() {
             const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
             allJobs = [...FALLBACK_JOBS, ...localJobs];
             renderJobs(allJobs);
 
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 2000) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
 
             fetch(`${API_BASE}/jobs`, controller ? { signal: controller.signal } : {})
                 .then(res => {
@@ -342,12 +312,12 @@
                         renderJobs(allJobs);
                     }
                 })
-                .catch(err => {
+                .catch(() => {
                     if (timeoutId) clearTimeout(timeoutId);
                 });
         }
 
-        // Render job cards
+        // Render Cards
         function renderJobs(jobs) {
             const container = document.getElementById("jobsContainer");
             const countText = document.getElementById("jobCountText");
@@ -356,11 +326,11 @@
 
             if (jobs.length === 0) {
                 container.innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <div class="glass-card p-4 mx-auto" style="max-width: 450px;">
-                            <i class="fas fa-folder-open text-secondary fa-3x mb-3"></i>
-                            <h5 class="text-white">No Positions Found</h5>
-                            <p class="text-secondary small">Try adjusting your search criteria or clearing filters.</p>
+                    <div class="col-span-full text-center py-12">
+                        <div class="glass-panel p-6 rounded-2xl max-w-md mx-auto">
+                            <i class="fas fa-folder-open text-slate-500 text-4xl mb-3"></i>
+                            <h3 class="text-white font-bold text-lg">No Positions Found</h3>
+                            <p class="text-slate-400 text-xs mt-1">Try adjusting your search criteria or clearing filters.</p>
                         </div>
                     </div>
                 `;
@@ -370,44 +340,54 @@
             let html = "";
             jobs.forEach(job => {
                 const initial = job.company ? job.company.charAt(0).toUpperCase() : 'J';
-                const cat = job.category || 'Tech';
+                const cat = job.category || 'Engineering';
                 const type = job.jobType || 'Full Time';
                 const loc = job.location || 'Remote';
                 const salary = job.salary || 'Competitive';
 
                 html += `
-                    <div class="col-md-6 col-lg-4 animate-fade-in">
-                        <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
-                            <div>
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="company-avatar">${initial}</div>
-                                        <div>
-                                            <h5 class="text-white mb-0 fs-6">${job.company}</h5>
-                                            <span class="text-secondary small"><i class="fas fa-map-marker-alt me-1 text-danger"></i>${loc}</span>
-                                        </div>
+                    <div class="glass-panel p-5 rounded-2xl hover:border-indigo-500/50 transition duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                        ${initial}
                                     </div>
-                                    <span class="badge-custom badge-tech">${cat}</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white group-hover:text-indigo-400 transition">${job.company}</h4>
+                                        <span class="text-xs text-slate-400 flex items-center gap-1">
+                                            <i class="fas fa-map-marker-alt text-rose-400 text-[10px]"></i> ${loc}
+                                        </span>
+                                    </div>
                                 </div>
-
-                                <h4 class="text-white fs-5 fw-bold mb-2">${job.title}</h4>
-                                <p class="text-secondary small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                    ${job.description || 'No description available.'}
-                                </p>
+                                <span class="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                                    ${cat}
+                                </span>
                             </div>
 
-                            <div>
-                                <div class="d-flex flex-wrap gap-2 mb-3">
-                                    <span class="badge-custom badge-remote"><i class="fas fa-clock me-1"></i>${type}</span>
-                                    <span class="badge-custom badge-pending" style="color: #67e8f9; border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.15);"><i class="fas fa-dollar-sign me-1"></i>${salary}</span>
-                                </div>
+                            <h3 class="text-base font-bold text-white mb-2 leading-snug">${job.title}</h3>
+                            <p class="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+                                ${job.description || 'No description available.'}
+                            </p>
+                        </div>
 
-                                <div class="pt-2 border-top border-secondary d-flex justify-content-between align-items-center">
-                                    <span class="text-muted small"><i class="far fa-calendar-alt me-1"></i>${job.postedDate || 'Recently'}</span>
-                                    <button onclick="openJobModal(${job.id})" class="btn btn-primary-gradient btn-sm">
-                                        View Details <i class="fas fa-arrow-right ms-1"></i>
-                                    </button>
-                                </div>
+                        <div>
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                                    <i class="far fa-clock mr-1 text-indigo-400"></i>${type}
+                                </span>
+                                <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                                    <i class="fas fa-dollar-sign mr-0.5"></i>${salary}
+                                </span>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                                <span class="text-[11px] text-slate-500">
+                                    <i class="far fa-calendar-alt mr-1"></i>${job.postedDate || 'Recent'}
+                                </span>
+                                <button onclick="openJobModal(${job.id})" class="btn-gradient text-xs font-semibold px-3.5 py-1.5 rounded-lg text-white shadow-md shadow-indigo-500/20 transition flex items-center gap-1.5">
+                                    View Details <i class="fas fa-arrow-right text-[10px]"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -417,19 +397,19 @@
             container.innerHTML = html;
         }
 
-        // Search & Filtering
+        // Filtering
         function filterJobs() {
-            const query = document.getElementById("searchInput").value.toLowerCase();
-            const location = document.getElementById("locationInput").value.toLowerCase();
+            const query = (document.getElementById("searchInput").value || "").toLowerCase();
+            const location = (document.getElementById("locationInput").value || "").toLowerCase();
             const type = document.getElementById("typeFilter").value;
 
             const filtered = allJobs.filter(job => {
                 const matchQuery = !query || 
-                    job.title.toLowerCase().includes(query) || 
-                    job.company.toLowerCase().includes(query) ||
+                    (job.title && job.title.toLowerCase().includes(query)) || 
+                    (job.company && job.company.toLowerCase().includes(query)) ||
                     (job.description && job.description.toLowerCase().includes(query));
                 
-                const matchLocation = !location || job.location.toLowerCase().includes(location);
+                const matchLocation = !location || (job.location && job.location.toLowerCase().includes(location));
                 const matchType = !type || job.jobType === type;
                 const matchCategory = !activeCategory || job.category === activeCategory;
 
@@ -442,82 +422,52 @@
         function selectCategory(category) {
             activeCategory = category;
             document.querySelectorAll("#categoryPills .filter-pill").forEach(pill => {
-                pill.classList.toggle("active", pill.dataset.cat === category);
+                pill.classList.remove("active");
             });
+            event.target.classList.add("active");
             filterJobs();
         }
 
+        // Modal Logic
         function displayJobModal(job) {
             if (!job) return;
             selectedJobId = job.id;
 
-            const avatar = document.getElementById("modalCompanyAvatar");
-            if (avatar) avatar.innerText = job.company ? job.company.charAt(0).toUpperCase() : 'J';
+            document.getElementById("modalCompanyAvatar").innerText = job.company ? job.company.charAt(0).toUpperCase() : 'J';
+            document.getElementById("modalJobTitle").innerText = job.title || 'Job Opening';
+            document.getElementById("modalCompanyName").innerText = job.company || 'Company';
+            document.getElementById("modalJobDescription").innerText = job.description || 'No description provided.';
 
-            const title = document.getElementById("modalJobTitle");
-            if (title) title.innerText = job.title || 'Job Details';
+            document.getElementById("modalBadges").innerHTML = `
+                <span class="text-xs px-2.5 py-1 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-medium">${job.category || 'Tech'}</span>
+                <span class="text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700 font-medium"><i class="fas fa-clock mr-1 text-indigo-400"></i>${job.jobType || 'Full Time'}</span>
+                <span class="text-xs px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 font-medium"><i class="fas fa-map-marker-alt mr-1"></i>${job.location || 'Remote'}</span>
+                <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium"><i class="fas fa-money-bill-wave mr-1"></i>${job.salary || 'Competitive'}</span>
+            `;
 
-            const company = document.getElementById("modalCompanyName");
-            if (company) company.innerText = job.company || 'Company';
-
-            const desc = document.getElementById("modalJobDescription");
-            if (desc) desc.innerText = job.description || 'No description available.';
-
-            const badges = document.getElementById("modalBadges");
-            if (badges) {
-                badges.innerHTML = `
-                    <span class="badge-custom badge-tech">${job.category || 'Tech'}</span>
-                    <span class="badge-custom badge-remote"><i class="fas fa-clock me-1"></i>${job.jobType || 'Full Time'}</span>
-                    <span class="badge-custom badge-pending" style="color: #67e8f9; border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.15);"><i class="fas fa-map-marker-alt me-1"></i>${job.location || 'Remote'}</span>
-                    <span class="badge-custom badge-accepted"><i class="fas fa-money-bill-wave me-1"></i>${job.salary || 'Competitive'}</span>
-                `;
-            }
-
-            const modalEl = document.getElementById('jobModal');
-            if (modalEl) {
-                let modal = bootstrap.Modal.getInstance(modalEl);
-                if (!modal) {
-                    modal = new bootstrap.Modal(modalEl);
-                }
-                modal.show();
-            }
+            document.getElementById("jobModal").classList.remove("hidden");
         }
 
-        // Open Job Modal
         function openJobModal(id) {
-            // 1. First check if job already loaded in allJobs memory
             let job = (typeof allJobs !== 'undefined' && Array.isArray(allJobs)) ? allJobs.find(j => j.id == id) : null;
-
-            // 2. Check in FALLBACK_JOBS array
             if (!job && typeof FALLBACK_JOBS !== 'undefined') {
                 job = FALLBACK_JOBS.find(j => j.id == id);
             }
-
             if (job) {
                 displayJobModal(job);
                 return;
             }
 
-            // 3. Fall back to fetch from backend if not found locally
             fetch(`${API_BASE}/jobs/${id}`)
-                .then(res => {
-                    if (!res.ok) throw new Error("HTTP " + res.status);
-                    return res.json();
-                })
-                .then(jobData => {
-                    if (jobData && (jobData.title || jobData.company)) {
-                        displayJobModal(jobData);
-                    } else {
-                        alert("Job details not found.");
-                    }
-                })
-                .catch(err => {
-                    console.warn("Unable to fetch job details from server:", err);
-                    alert("Unable to fetch job details. Please try again later.");
-                });
+                .then(r => r.ok ? r.json() : null)
+                .then(data => { if (data) displayJobModal(data); else alert("Job details not found."); })
+                .catch(() => alert("Unable to load job details."));
         }
 
-        // Submit Application
+        function closeJobModal() {
+            document.getElementById("jobModal").classList.add("hidden");
+        }
+
         function submitApplication() {
             const userId = localStorage.getItem("userId");
             if (!userId) {
@@ -528,8 +478,8 @@
 
             const coverLetterInput = document.getElementById("coverLetterInput");
             const resumeUrlInput = document.getElementById("resumeUrlInput");
-            const coverLetter = coverLetterInput ? coverLetterInput.value : "";
-            const resumeUrl = resumeUrlInput ? resumeUrlInput.value : "";
+            const coverLetter = coverLetterInput ? coverLetterInput.value.trim() : "";
+            const resumeUrl = resumeUrlInput ? resumeUrlInput.value.trim() : "";
 
             const application = {
                 id: Date.now(),
@@ -541,134 +491,33 @@
                 appliedDate: new Date().toISOString().split('T')[0]
             };
 
-            const saveLocalApp = (appObj) => {
-                const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
-                const existingIndex = localApps.findIndex(a => a.jobId == appObj.jobId && a.userId == appObj.userId);
-                if (existingIndex >= 0) {
-                    localApps[existingIndex] = { ...localApps[existingIndex], ...appObj };
-                } else {
-                    localApps.push(appObj);
-                }
-                localStorage.setItem("local_applications", JSON.stringify(localApps));
-            };
-
-            saveLocalApp(application);
+            const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+            localApps.push(application);
+            localStorage.setItem("local_applications", JSON.stringify(localApps));
 
             const btn = document.getElementById("btnSubmitApplication");
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Submitting...`;
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Submitting...`;
             }
-
-            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
 
             fetch(`${API_BASE}/applications`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    jobId: selectedJobId,
-                    userId: parseInt(userId),
-                    coverLetter: coverLetter,
-                    resumeUrl: resumeUrl
-                }),
-                signal: controller ? controller.signal : null
+                body: JSON.stringify({ jobId: selectedJobId, userId: parseInt(userId), coverLetter, resumeUrl })
             })
-            .then(async res => {
-                if (timeoutId) clearTimeout(timeoutId);
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                    throw new Error(data.message || "Failed to submit application");
-                }
-                if (data && data.id) {
-                    saveLocalApp({ ...application, id: data.id });
-                }
-                return data;
-            })
-            .then(data => {
-                alert("🎉 Application submitted successfully!");
-                const modalEl = document.getElementById('jobModal');
-                if (modalEl) {
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                }
-                if (coverLetterInput) coverLetterInput.value = "";
-                if (resumeUrlInput) resumeUrlInput.value = "";
-            })
-            .catch(err => {
-                if (timeoutId) clearTimeout(timeoutId);
-                console.warn("Backend unavailable, application saved to local storage:", err);
-                alert("🎉 Application submitted successfully!");
-                const modalEl = document.getElementById('jobModal');
-                if (modalEl) {
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                }
-                if (coverLetterInput) coverLetterInput.value = "";
-                if (resumeUrlInput) resumeUrlInput.value = "";
-            })
+            .then(res => res.json())
+            .catch(() => {})
             .finally(() => {
+                alert("🎉 Application submitted successfully!");
+                closeJobModal();
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = `<i class="fas fa-check-circle"></i> Submit Application`;
                 }
+                if (coverLetterInput) coverLetterInput.value = "";
+                if (resumeUrlInput) resumeUrlInput.value = "";
             });
-        }
-
-        const QUICK_DEMO_ACCOUNTS = {
-            "alex@seeker.com": { id: 4, name: "Alex Johnson", email: "alex@seeker.com", role: "JOB_SEEKER" },
-            "techcorp@jobs.com": { id: 2, name: "Sarah Jenkins", email: "techcorp@jobs.com", role: "RECRUITER" },
-            "admin@jobhub.com": { id: 1, name: "System Administrator", email: "admin@jobhub.com", role: "ADMIN" }
-        };
-
-        // Demo Quick Login
-        function quickLogin(email, password) {
-            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3000) : null;
-
-            fetch(`${API_BASE}/users/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-                signal: controller ? controller.signal : null
-            })
-            .then(res => {
-                if (timeoutId) clearTimeout(timeoutId);
-                return res.json();
-            })
-            .then(data => {
-                if (data && data.id) {
-                    applyDemoUser(data);
-                } else if (QUICK_DEMO_ACCOUNTS[email]) {
-                    applyDemoUser(QUICK_DEMO_ACCOUNTS[email]);
-                } else {
-                    alert("Quick login failed.");
-                }
-            })
-            .catch(err => {
-                if (timeoutId) clearTimeout(timeoutId);
-                if (QUICK_DEMO_ACCOUNTS[email]) {
-                    applyDemoUser(QUICK_DEMO_ACCOUNTS[email]);
-                } else {
-                    alert("Quick login server error.");
-                }
-            });
-        }
-
-        function applyDemoUser(data) {
-            localStorage.setItem("userId", data.id);
-            localStorage.setItem("userName", data.name);
-            localStorage.setItem("userEmail", data.email);
-            localStorage.setItem("userRole", data.role);
-
-            if (data.role === "RECRUITER") {
-                window.location.href = "recruiter-dashboard.html";
-            } else if (data.role === "ADMIN") {
-                window.location.href = "admin-dashboard.html";
-            } else {
-                checkAuth();
-                alert(`Welcome back, ${data.name}! You are logged in as Job Seeker.`);
-            }
         }
 
         function logout() {

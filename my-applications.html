@@ -3,117 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Applications - JobHub</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>JobHub - My Applications Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        accent: '#a855f7',
+                        darkBg: '#090d16',
+                        cardBg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #090d16; }
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .btn-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+        .btn-gradient:hover { background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between text-slate-100">
 
-    <!-- Glass Navbar -->
-    <nav class="navbar navbar-expand-lg glass-nav">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-                <div class="company-avatar" style="width: 38px; height: 38px; font-size: 1.1rem;">
+    <!-- Top Navigation -->
+    <header class="w-full glass-panel sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
                     <i class="fas fa-briefcase"></i>
                 </div>
-                <span class="fs-4 fw-bold text-white">Job<span style="color: var(--primary);">Hub</span></span>
+                <span class="text-xl font-bold tracking-tight text-white">Job<span class="text-indigo-400">Hub</span></span>
             </a>
 
-            <div class="d-flex align-items-center gap-3">
-                <a href="index.html" class="btn btn-glass btn-sm"><i class="fas fa-search me-1"></i> Browse Jobs</a>
-                <button onclick="logout()" class="btn btn-glass btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
+            <!-- Navigation Links -->
+            <nav class="flex items-center gap-4 sm:gap-6 text-sm font-medium text-slate-300">
+                <a href="jobs.html" class="hover:text-white transition flex items-center gap-1.5">
+                    <i class="fas fa-search text-xs"></i> Browse Jobs
+                </a>
+                <a href="my-applications.html" class="text-indigo-400 font-semibold flex items-center gap-1.5">
+                    <i class="fas fa-file-alt text-xs"></i> Applications
+                </a>
+                <button onclick="logout()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <!-- Header Banner -->
-    <div class="container py-4">
-        <div class="glass-card p-4 mb-4">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="company-avatar" id="candidateAvatar" style="width: 56px; height: 56px; font-size: 1.5rem;">A</div>
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- Welcome Banner -->
+        <section class="glass-panel p-6 sm:p-8 rounded-3xl mb-8 relative border border-slate-800">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div id="candidateAvatar" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-extrabold shadow-lg shadow-indigo-500/25">
+                        A
+                    </div>
                     <div>
-                        <h3 class="text-white mb-0" id="candidateName">My Application Dashboard</h3>
-                        <span class="text-secondary small" id="candidateEmail">Track status & updates on your submitted job applications</span>
+                        <h1 id="candidateName" class="text-xl sm:text-2xl font-extrabold text-white mb-0.5">My Application Dashboard</h1>
+                        <p id="candidateEmail" class="text-xs sm:text-sm text-slate-400">Track real-time status and hiring updates</p>
                     </div>
                 </div>
+
+                <a href="jobs.html" class="btn-gradient px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition self-start sm:self-auto flex items-center gap-2">
+                    <i class="fas fa-plus-circle"></i> Find More Roles
+                </a>
             </div>
-        </div>
+        </section>
 
         <!-- Metrics Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="glass-card p-3 text-center">
-                    <span class="text-secondary small font-semibold">Total Submitted</span>
-                    <h2 class="text-white fw-bold mb-0" id="cntTotal">0</h2>
-                </div>
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 text-center">
+                <span class="text-xs text-slate-400 font-medium block mb-1">Total Submitted</span>
+                <h2 id="cntTotal" class="text-2xl sm:text-3xl font-extrabold text-white">0</h2>
             </div>
-            <div class="col-md-3">
-                <div class="glass-card p-3 text-center">
-                    <span class="text-warning small font-semibold">Pending / Reviewing</span>
-                    <h2 class="text-warning fw-bold mb-0" id="cntPending">0</h2>
-                </div>
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 text-center">
+                <span class="text-xs text-amber-400 font-medium block mb-1">Pending / In Review</span>
+                <h2 id="cntPending" class="text-2xl sm:text-3xl font-extrabold text-amber-400">0</h2>
             </div>
-            <div class="col-md-3">
-                <div class="glass-card p-3 text-center">
-                    <span class="text-emerald small font-semibold" style="color: #34d399;">Accepted Offers</span>
-                    <h2 class="text-success fw-bold mb-0" id="cntAccepted">0</h2>
-                </div>
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 text-center">
+                <span class="text-xs text-emerald-400 font-medium block mb-1">Accepted Offers</span>
+                <h2 id="cntAccepted" class="text-2xl sm:text-3xl font-extrabold text-emerald-400">0</h2>
             </div>
-            <div class="col-md-3">
-                <div class="glass-card p-3 text-center">
-                    <span class="text-rose small font-semibold" style="color: #fda4af;">Declined</span>
-                    <h2 class="text-danger fw-bold mb-0" id="cntRejected">0</h2>
-                </div>
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 text-center">
+                <span class="text-xs text-rose-400 font-medium block mb-1">Declined</span>
+                <h2 id="cntRejected" class="text-2xl sm:text-3xl font-extrabold text-rose-400">0</h2>
             </div>
-        </div>
+        </section>
 
         <!-- Applications List -->
-        <h4 class="text-white mb-3"><i class="fas fa-tasks text-primary me-2"></i>Application History</h4>
-        <div id="applicationsContainer" class="d-flex flex-column gap-3">
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary"></div>
-                <p class="text-secondary mt-2">Loading applications...</p>
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-tasks text-indigo-400"></i> Application History
+                </h2>
+                <span class="text-xs text-slate-500">Auto-synced with candidate record</span>
             </div>
-        </div>
-    </div>
 
+            <div id="applicationsContainer" class="space-y-4">
+                <div class="text-center py-16">
+                    <div class="inline-block animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mb-3"></div>
+                    <p class="text-slate-400 text-sm">Loading applications...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-slate-800/80 py-8 mt-12 bg-slate-950/40">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-xs text-slate-500">
+                &copy; 2026 JobHub Platform &bull; Built with Tailwind CSS & Spring Boot. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
     <script>
-        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-            ? "http://localhost:8080/api"
+        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") 
+            ? "http://localhost:8080/api" 
             : "https://jobhub-backend.onrender.com/api";
+
         const userId = localStorage.getItem("userId");
+
+        const FALLBACK_JOBS_MAP = {
+            1: { title: "Senior Full Stack Engineer", company: "Google", location: "Mountain View, CA", salary: "$165k - $195k" },
+            2: { title: "Lead UI/UX Product Designer", company: "Airbnb", location: "San Francisco, CA", salary: "$140k - $170k" },
+            3: { title: "DevOps & Cloud Architect", company: "Netflix", location: "Los Gatos, CA", salary: "$180k - $220k" },
+            4: { title: "AI & Machine Learning Engineer", company: "OpenAI", location: "San Francisco, CA", salary: "$200k - $260k" },
+            5: { title: "Technical Product Manager", company: "Stripe", location: "Seattle, WA", salary: "$150k - $185k" },
+            6: { title: "Growth Marketing Specialist", company: "Spotify", location: "New York, NY", salary: "$110k - $135k" }
+        };
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!userId) {
-                alert("Please login to view your applications.");
+                alert("Please log in to view your applications.");
                 window.location.href = "login.html";
                 return;
             }
 
-            document.getElementById("candidateName").innerText = localStorage.getItem("userName") || "Candidate Dashboard";
-            document.getElementById("candidateEmail").innerText = localStorage.getItem("userEmail") || "Job Seeker";
-            document.getElementById("candidateAvatar").innerText = (localStorage.getItem("userName") || 'A').charAt(0).toUpperCase();
+            const userName = localStorage.getItem("userName") || "Candidate";
+            const userEmail = localStorage.getItem("userEmail") || "user@jobhub.com";
+
+            document.getElementById("candidateName").innerText = userName + "'s Applications";
+            document.getElementById("candidateEmail").innerText = userEmail;
+            document.getElementById("candidateAvatar").innerText = userName.charAt(0).toUpperCase();
 
             loadApplications();
         });
 
-        const FALLBACK_JOBS_MAP = {
-            1: { title: "Senior Full-Stack Developer", company: "TechCorp Inc.", location: "Remote / San Francisco", salary: "$140,000 - $165,000" },
-            2: { title: "UI/UX Product Designer", company: "NextGen AI", location: "San Francisco, CA", salary: "$115,000 - $135,000" },
-            3: { title: "Machine Learning Researcher", company: "NextGen AI", location: "Remote", salary: "$155,000 - $185,000" },
-            4: { title: "DevOps & Cloud Engineer", company: "TechCorp Inc.", location: "New York, NY", salary: "$130,000 - $150,000" },
-            5: { title: "Technical Product Manager", company: "InnovateLabs", location: "Hybrid (Chicago, IL)", salary: "$120,000 - $140,000" },
-            6: { title: "Frontend React Specialist", company: "CloudScale Technologies", location: "Remote", salary: "$100,000 - $120,000" }
-        };
-
         function loadApplications() {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 2500) : null;
 
             fetch(`${API_BASE}/applications/user/${userId}`, controller ? { signal: controller.signal } : {})
                 .then(res => {
@@ -124,34 +174,41 @@
                 .then(apps => {
                     renderApplications(apps);
                 })
-                .catch(err => {
+                .catch(() => {
                     if (timeoutId) clearTimeout(timeoutId);
-                    console.warn("Backend unreachable/slow. Displaying local applications:", err);
                     renderApplications([]);
                 });
         }
 
         function renderApplications(fetchedApps) {
             const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
-            const userLocalApps = localApps.filter(a => a.userId == userId);
+            const userLocalApps = localApps.filter(a => String(a.userId) === String(userId));
 
             // Merge fetched and local applications (deduplicate by jobId)
             const appMap = {};
-            userLocalApps.forEach(a => appMap[a.jobId] = a);
+            userLocalApps.forEach(a => { appMap[a.jobId] = a; });
             if (Array.isArray(fetchedApps)) {
-                fetchedApps.forEach(a => appMap[a.jobId] = a);
+                fetchedApps.forEach(a => { appMap[a.jobId] = a; });
             }
 
             const combinedApps = Object.values(appMap);
             updateCounts(combinedApps);
 
+            const container = document.getElementById("applicationsContainer");
+
             if (combinedApps.length === 0) {
-                document.getElementById("applicationsContainer").innerHTML = `
-                    <div class="glass-card p-5 text-center">
-                        <i class="fas fa-file-invoice text-secondary fa-3x mb-3"></i>
-                        <h5 class="text-white">No Applications Yet</h5>
-                        <p class="text-secondary small mb-3">You haven't submitted any job applications yet.</p>
-                        <a href="index.html" class="btn btn-primary-gradient"><i class="fas fa-search me-1"></i> Explore Jobs</a>
+                container.innerHTML = `
+                    <div class="glass-panel p-8 sm:p-12 text-center rounded-2xl border border-slate-800">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-2xl mx-auto mb-4">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <h3 class="text-white font-bold text-lg mb-1">No Applications Submitted Yet</h3>
+                        <p class="text-slate-400 text-xs sm:text-sm max-w-sm mx-auto mb-6">
+                            Start applying to verified tech openings today and your application tracking timeline will appear right here.
+                        </p>
+                        <a href="jobs.html" class="btn-gradient inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-lg shadow-indigo-500/20 transition">
+                            <i class="fas fa-search"></i> Browse All Openings
+                        </a>
                     </div>
                 `;
                 return;
@@ -159,42 +216,71 @@
 
             let html = "";
             combinedApps.forEach(app => {
-                const job = FALLBACK_JOBS_MAP[app.jobId] || { title: "Job Position #" + app.jobId, company: "Tech Company", location: "Remote", salary: "Competitive" };
-                
-                let badgeHtml = "";
+                const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
+                const dynamicJob = localJobs.find(j => j.id == app.jobId);
+                const job = dynamicJob || FALLBACK_JOBS_MAP[app.jobId] || { 
+                    title: "Position #" + app.jobId, 
+                    company: "Tech Enterprise", 
+                    location: "Remote", 
+                    salary: "Competitive" 
+                };
+
+                let badgeClass = "bg-amber-500/10 text-amber-300 border-amber-500/20";
+                let badgeText = "Pending Review";
+                let iconClass = "fa-hourglass-half";
+
                 const st = (app.status || "PENDING").toUpperCase();
                 if (st === "ACCEPTED") {
-                    badgeHtml = `<span class="badge-custom badge-accepted"><i class="fas fa-check-circle me-1"></i> Accepted / Offer</span>`;
+                    badgeClass = "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
+                    badgeText = "Accepted / Offer Extended";
+                    iconClass = "fa-check-circle";
                 } else if (st === "REJECTED") {
-                    badgeHtml = `<span class="badge-custom badge-rejected"><i class="fas fa-times-circle me-1"></i> Declined</span>`;
+                    badgeClass = "bg-rose-500/10 text-rose-300 border-rose-500/20";
+                    badgeText = "Declined";
+                    iconClass = "fa-times-circle";
                 } else if (st === "UNDER_REVIEW") {
-                    badgeHtml = `<span class="badge-custom badge-reviewing"><i class="fas fa-search me-1"></i> Under Review</span>`;
-                } else {
-                    badgeHtml = `<span class="badge-custom badge-pending"><i class="fas fa-hourglass-half me-1"></i> Pending</span>`;
+                    badgeClass = "bg-blue-500/10 text-blue-300 border-blue-500/20";
+                    badgeText = "Under Review";
+                    iconClass = "fa-search";
                 }
 
+                const initial = job.company ? job.company.charAt(0).toUpperCase() : 'J';
+
                 html += `
-                    <div class="glass-card p-4 animate-fade-in">
-                        <div class="row align-items-center g-3">
-                            <div class="col-md-7">
-                                <div class="d-flex align-items-center gap-3 mb-2">
-                                    <div class="company-avatar" style="width: 44px; height: 44px;">
-                                        ${job.company ? job.company.charAt(0).toUpperCase() : 'J'}
-                                    </div>
-                                    <div>
-                                        <h5 class="text-white mb-0 fw-bold">${job.title}</h5>
-                                        <span class="text-primary fw-semibold small">${job.company}</span>
-                                        <span class="text-secondary small ms-2"><i class="fas fa-map-marker-alt me-1 text-danger"></i>${job.location}</span>
-                                    </div>
+                    <div class="glass-panel p-5 sm:p-6 rounded-2xl border border-slate-800 hover:border-slate-700 transition">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <!-- Left Info -->
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
+                                    ${initial}
                                 </div>
-                                ${app.coverLetter ? `<p class="text-secondary small mt-2 mb-0 bg-dark p-2 rounded border border-secondary" style="font-style: italic;">"${app.coverLetter}"</p>` : ''}
+                                <div>
+                                    <h3 class="text-base sm:text-lg font-bold text-white mb-0.5">${job.title}</h3>
+                                    <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                                        <span class="text-indigo-400 font-semibold">${job.company}</span>
+                                        <span>&bull;</span>
+                                        <span><i class="fas fa-map-marker-alt text-rose-400 text-[10px] mr-1"></i>${job.location}</span>
+                                        <span>&bull;</span>
+                                        <span class="text-emerald-400"><i class="fas fa-dollar-sign text-[10px]"></i>${job.salary}</span>
+                                    </div>
+                                    ${app.coverLetter ? `
+                                        <p class="text-xs text-slate-400 mt-2 bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 italic max-w-xl">
+                                            "${app.coverLetter}"
+                                        </p>
+                                    ` : ''}
+                                </div>
                             </div>
 
-                            <div class="col-md-5 d-flex flex-column align-items-md-end justify-content-between gap-2">
-                                <div>${badgeHtml}</div>
-                                <span class="text-muted small"><i class="far fa-calendar-alt me-1"></i>Applied: ${app.appliedDate || 'Recently'}</span>
-                                <button onclick="cancelApp(${app.id || app.jobId})" class="btn btn-outline-danger btn-sm px-3 mt-1">
-                                    <i class="fas fa-trash-alt me-1"></i> Cancel Application
+                            <!-- Right Status & Actions -->
+                            <div class="flex flex-row md:flex-col md:items-end justify-between items-center gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${badgeClass}">
+                                    <i class="fas ${iconClass} text-[10px]"></i> ${badgeText}
+                                </span>
+                                <span class="text-[11px] text-slate-500">
+                                    <i class="far fa-calendar-alt mr-1"></i>Applied: ${app.appliedDate || 'Recently'}
+                                </span>
+                                <button onclick="cancelApp(${app.id || app.jobId})" class="text-xs text-rose-400 hover:text-rose-300 font-medium px-2 py-1 rounded hover:bg-rose-500/10 transition flex items-center gap-1">
+                                    <i class="fas fa-trash-alt text-[10px]"></i> Withdraw
                                 </button>
                             </div>
                         </div>
@@ -202,7 +288,7 @@
                 `;
             });
 
-            document.getElementById("applicationsContainer").innerHTML = html;
+            container.innerHTML = html;
         }
 
         function updateCounts(apps) {
@@ -220,20 +306,23 @@
         }
 
         function cancelApp(id) {
-            if (!confirm("Are you sure you want to cancel this application?")) return;
+            if (!confirm("Are you sure you want to withdraw this job application?")) return;
 
             const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
             const updated = localApps.filter(a => a.id != id && a.jobId != id);
             localStorage.setItem("local_applications", JSON.stringify(updated));
 
             fetch(`${API_BASE}/applications/${id}`, { method: "DELETE" }).catch(() => {});
-            alert("Application cancelled.");
+            alert("Application withdrawn.");
             loadApplications();
         }
 
         function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userName");
+            localStorage.removeItem("userRole");
+            window.location.href = "login.html";
         }
     </script>
 </body>

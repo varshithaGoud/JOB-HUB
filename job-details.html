@@ -1,24 +1,413 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Job Details - JobHub</title><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobHub - Position Details</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        accent: '#a855f7',
+                        darkBg: '#090d16',
+                        cardBg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #090d16; }
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .btn-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+        .btn-gradient:hover { background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%); }
+    </style>
 </head>
-<body class="bg-light"><nav class="navbar navbar-dark bg-primary"><div class="container"><a class="navbar-brand" href="jobs.html">JobHub</a><a class="btn btn-light" href="jobs.html">All Jobs</a></div></nav>
-<div class="container mt-5"><div id="job" class="card shadow p-4">Loading job details...</div></div>
-<script>
-const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:8080/api" : "https://jobhub-backend.onrender.com/api";
-const id=new URLSearchParams(location.search).get("id");
-fetch(API_BASE+"/jobs/"+id).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>job.innerHTML=`<h2>${esc(j.title)}</h2><h5 class="text-primary">${esc(j.company)}</h5><hr>
-<p><b>Location:</b> ${esc(j.location)}</p><p><b>Salary:</b> ${esc(j.salary)}</p><p><b>Job Type:</b> ${esc(j.jobType)}</p><p><b>Description:</b></p><p>${esc(j.description||"")}</p><hr>
-<button class="btn btn-success" onclick="applyJob()">Apply Now</button> <a href="jobs.html" class="btn btn-secondary">Back to Jobs</a>`).catch(()=>job.innerHTML='<p class="text-danger">Unable to load job details.</p>');
-function applyJob(){const uid=localStorage.getItem("userId");if(!uid){alert("Please login first!");location.href="login.html";return}
-const appObj={id:Date.now(),jobId:Number(id),userId:Number(uid),status:"PENDING",appliedDate:new Date().toISOString().split('T')[0]};
-const localApps=JSON.parse(localStorage.getItem("local_applications")||"[]");
-const idx=localApps.findIndex(a=>a.jobId==appObj.jobId&&a.userId==appObj.userId);
-if(idx>=0)localApps[idx]={...localApps[idx],...appObj};else localApps.push(appObj);
-localStorage.setItem("local_applications",JSON.stringify(localApps));
-fetch(API_BASE+"/applications",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jobId:Number(id),userId:Number(uid)})})
-.then(()=>{alert("Application submitted successfully!");location.href="my-applications.html"}).catch(()=>{alert("Application submitted successfully!");location.href="my-applications.html"})}
-function esc(v){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
-</script></body></html>
+<body class="min-h-screen flex flex-col justify-between text-slate-100">
+
+    <!-- Top Navigation -->
+    <header class="w-full glass-panel sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-white">Job<span class="text-indigo-400">Hub</span></span>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="flex items-center gap-4 sm:gap-6 text-sm font-medium text-slate-300">
+                <a href="jobs.html" class="hover:text-white transition flex items-center gap-1.5">
+                    <i class="fas fa-arrow-left text-xs"></i> Back to Jobs
+                </a>
+                <a id="navMyApps" href="my-applications.html" class="hidden hover:text-white transition items-center gap-1.5">
+                    <i class="fas fa-file-alt text-xs"></i> Applications
+                </a>
+                <div id="authButtons"></div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        
+        <!-- Loading Indicator -->
+        <div id="loadingBox" class="text-center py-20">
+            <div class="inline-block animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mb-3"></div>
+            <p class="text-slate-400 text-sm">Retrieving position details...</p>
+        </div>
+
+        <!-- Position Card Container -->
+        <div id="jobDetailsCard" class="hidden space-y-6">
+            
+            <!-- Hero Card -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden border border-slate-800">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-800">
+                    <div class="flex items-center gap-4">
+                        <div id="companyAvatar" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-xl shadow-indigo-500/20">
+                            J
+                        </div>
+                        <div>
+                            <h1 id="jobTitle" class="text-2xl sm:text-3xl font-extrabold text-white mb-1">Position Title</h1>
+                            <p id="companyName" class="text-indigo-400 font-semibold text-base sm:text-lg">Company Name</p>
+                        </div>
+                    </div>
+
+                    <button onclick="scrollToApply()" class="btn-gradient px-6 py-3 rounded-xl font-bold text-sm text-white shadow-lg shadow-indigo-500/25 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-paper-plane"></i> Apply for this Role
+                    </button>
+                </div>
+
+                <!-- Metrics & Tags Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6">
+                    <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-xs text-slate-400 font-medium block mb-1"><i class="fas fa-map-marker-alt text-rose-400 mr-1.5"></i>Location</span>
+                        <p id="jobLocation" class="text-sm font-bold text-slate-200">Remote</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-xs text-slate-400 font-medium block mb-1"><i class="far fa-clock text-indigo-400 mr-1.5"></i>Job Type</span>
+                        <p id="jobType" class="text-sm font-bold text-slate-200">Full Time</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-xs text-slate-400 font-medium block mb-1"><i class="fas fa-money-bill-wave text-emerald-400 mr-1.5"></i>Salary</span>
+                        <p id="jobSalary" class="text-sm font-bold text-emerald-300">Competitive</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-xs text-slate-400 font-medium block mb-1"><i class="fas fa-tag text-purple-400 mr-1.5"></i>Category</span>
+                        <p id="jobCategory" class="text-sm font-bold text-indigo-300">Engineering</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout: Description & Application Form -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Details -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800">
+                        <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-align-left text-indigo-400"></i> Role Description & Responsibilities
+                        </h2>
+                        <div id="jobDescription" class="text-slate-300 text-sm leading-relaxed whitespace-pre-line space-y-3">
+                            <!-- Injected description -->
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                        <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fas fa-check-circle text-emerald-400"></i> What We Offer
+                        </h3>
+                        <ul class="text-xs text-slate-400 space-y-2 list-disc list-inside">
+                            <li>Competitive base salary + performance incentives & equity options.</li>
+                            <li>Full health, dental, and vision insurance coverage from day one.</li>
+                            <li>Flexible remote work schedule and home office upgrade stipend.</li>
+                            <li>Annual continuous learning budget for conferences, courses, and books.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Application Form -->
+                <div class="lg:col-span-5" id="applySection">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 sticky top-24">
+                        <h2 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <i class="fas fa-paper-plane text-indigo-400"></i> Quick Apply
+                        </h2>
+                        <p class="text-xs text-slate-400 mb-5">
+                            Submit your profile directly to the recruiter.
+                        </p>
+
+                        <div id="alreadyAppliedBadge" class="hidden mb-4 p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs">
+                            <i class="fas fa-check-circle mr-1"></i> You have already applied for this opening. You can update your submission below.
+                        </div>
+
+                        <form id="applyForm" onsubmit="handleApply(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">Candidate Name</label>
+                                <input type="text" id="applicantName" required placeholder="Your full name"
+                                    class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+                                <input type="email" id="applicantEmail" required placeholder="you@domain.com"
+                                    class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">Resume / Portfolio Link</label>
+                                <input type="url" id="applicantResume" placeholder="https://github.com/... or Google Drive"
+                                    class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">Cover Letter / Note</label>
+                                <textarea id="applicantCover" rows="4" placeholder="Briefly introduce your relevant qualifications..."
+                                    class="w-full bg-slate-900/90 border border-slate-800 text-white rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500"></textarea>
+                            </div>
+
+                            <button type="submit" id="btnSubmitApply" class="w-full btn-gradient py-3 rounded-xl font-bold text-sm text-white shadow-lg shadow-indigo-500/25 transition">
+                                Confirm & Submit Application
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-slate-800/80 py-8 mt-12 bg-slate-950/40">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-xs text-slate-500">
+                &copy; 2026 JobHub Platform &bull; Built with Tailwind CSS & Spring Boot. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") 
+            ? "http://localhost:8080/api" 
+            : "https://jobhub-backend.onrender.com/api";
+
+        const FALLBACK_JOBS = [
+            {
+                id: 1,
+                title: "Senior Full Stack Engineer",
+                company: "Google",
+                location: "Mountain View, CA (Hybrid)",
+                salary: "$165,000 - $195,000",
+                jobType: "Full Time",
+                category: "Engineering",
+                description: "Design and scale resilient web platforms using Spring Boot, React, and cloud native architectures. Mentor engineers and conduct architectural reviews.",
+                postedDate: "Just now"
+            },
+            {
+                id: 2,
+                title: "Lead UI/UX Product Designer",
+                company: "Airbnb",
+                location: "San Francisco, CA (Remote)",
+                salary: "$140,000 - $170,000",
+                jobType: "Remote",
+                category: "Design",
+                description: "Craft modern, accessible, and high-conversion interfaces for millions of global travelers. Drive our modern design token system and user research.",
+                postedDate: "2 hours ago"
+            },
+            {
+                id: 3,
+                title: "DevOps & Cloud Architect",
+                company: "Netflix",
+                location: "Los Gatos, CA",
+                salary: "$180,000 - $220,000",
+                jobType: "Full Time",
+                category: "Engineering",
+                description: "Scale high-throughput streaming pipelines with Kubernetes, Terraform, AWS, and distributed telemetry. Optimize edge latency and fault recovery.",
+                postedDate: "1 day ago"
+            },
+            {
+                id: 4,
+                title: "AI & Machine Learning Engineer",
+                company: "OpenAI",
+                location: "San Francisco, CA (Hybrid)",
+                salary: "$200,000 - $260,000",
+                jobType: "Full Time",
+                category: "Data & AI",
+                description: "Build scalable training pipelines, inference optimization, and developer toolkits for cutting-edge multimodal intelligence models.",
+                postedDate: "2 days ago"
+            },
+            {
+                id: 5,
+                title: "Technical Product Manager",
+                company: "Stripe",
+                location: "Seattle, WA (Remote)",
+                salary: "$150,000 - $185,000",
+                jobType: "Remote",
+                category: "Product",
+                description: "Drive strategy and developer experience for global billing and payout APIs. Work alongside engineering and top fintech merchant partners.",
+                postedDate: "3 days ago"
+            },
+            {
+                id: 6,
+                title: "Growth Marketing Specialist",
+                company: "Spotify",
+                location: "New York, NY",
+                salary: "$110,000 - $135,000",
+                jobType: "Full Time",
+                category: "Marketing",
+                description: "Execute user acquisition campaigns, optimize funnels, and analyze listener retention metrics across digital channels and podcasts.",
+                postedDate: "4 days ago"
+            }
+        ];
+
+        let currentJob = null;
+        let jobId = new URLSearchParams(window.location.search).get("id") || "1";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initAuth();
+            loadJobDetails();
+        });
+
+        function initAuth() {
+            const userId = localStorage.getItem("userId");
+            const userName = localStorage.getItem("userName");
+            const userEmail = localStorage.getItem("userEmail");
+            const userRole = localStorage.getItem("userRole");
+
+            if (userName) document.getElementById("applicantName").value = userName;
+            if (userEmail) document.getElementById("applicantEmail").value = userEmail;
+
+            const authContainer = document.getElementById("authButtons");
+            const navMyApps = document.getElementById("navMyApps");
+
+            if (userId) {
+                if (navMyApps) navMyApps.classList.remove("hidden"), navMyApps.classList.add("flex");
+                authContainer.innerHTML = `
+                    <button onclick="logout()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                `;
+            } else {
+                authContainer.innerHTML = `
+                    <a href="login.html" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                        Sign In
+                    </a>
+                `;
+            }
+
+            // Check if already applied
+            const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+            const existing = localApps.find(a => a.jobId == jobId && a.userId == (userId || 0));
+            if (existing) {
+                document.getElementById("alreadyAppliedBadge").classList.remove("hidden");
+                if (existing.resumeUrl) document.getElementById("applicantResume").value = existing.resumeUrl;
+                if (existing.coverLetter) document.getElementById("applicantCover").value = existing.coverLetter;
+            }
+        }
+
+        function loadJobDetails() {
+            const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
+            const combined = [...FALLBACK_JOBS, ...localJobs];
+            const localMatch = combined.find(j => String(j.id) === String(jobId));
+
+            if (localMatch) {
+                renderDetails(localMatch);
+            }
+
+            // Silent fetch from backend
+            fetch(`${API_BASE}/jobs/${jobId}`)
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (data) renderDetails(data);
+                })
+                .catch(() => {
+                    if (!localMatch && combined.length > 0) {
+                        renderDetails(combined[0]);
+                    }
+                });
+        }
+
+        function renderDetails(job) {
+            currentJob = job;
+            document.getElementById("loadingBox").classList.add("hidden");
+            document.getElementById("jobDetailsCard").classList.remove("hidden");
+
+            document.getElementById("companyAvatar").innerText = job.company ? job.company.charAt(0).toUpperCase() : 'J';
+            document.getElementById("jobTitle").innerText = job.title || 'Job Opening';
+            document.getElementById("companyName").innerText = job.company || 'Company';
+            document.getElementById("jobLocation").innerText = job.location || 'Remote';
+            document.getElementById("jobType").innerText = job.jobType || 'Full Time';
+            document.getElementById("jobSalary").innerText = job.salary || 'Competitive';
+            document.getElementById("jobCategory").innerText = job.category || 'Engineering';
+            document.getElementById("jobDescription").innerText = job.description || 'No description provided.';
+            document.title = `${job.title} at ${job.company} - JobHub`;
+        }
+
+        function scrollToApply() {
+            document.getElementById("applySection").scrollIntoView({ behavior: 'smooth' });
+            document.getElementById("applicantResume").focus();
+        }
+
+        function handleApply(e) {
+            e.preventDefault();
+            const userId = localStorage.getItem("userId") || "101";
+            const userName = document.getElementById("applicantName").value;
+            const userEmail = document.getElementById("applicantEmail").value;
+            const resumeUrl = document.getElementById("applicantResume").value;
+            const coverLetter = document.getElementById("applicantCover").value;
+
+            const application = {
+                id: Date.now(),
+                jobId: parseInt(jobId),
+                userId: parseInt(userId),
+                applicantName: userName,
+                applicantEmail: userEmail,
+                resumeUrl: resumeUrl,
+                coverLetter: coverLetter,
+                status: "PENDING",
+                appliedDate: new Date().toISOString().split('T')[0]
+            };
+
+            // Save in local applications for 100% reliability
+            const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+            const existingIdx = localApps.findIndex(a => a.jobId == jobId && a.userId == parseInt(userId));
+            if (existingIdx >= 0) {
+                localApps[existingIdx] = application;
+            } else {
+                localApps.push(application);
+            }
+            localStorage.setItem("local_applications", JSON.stringify(localApps));
+
+            // Sync with backend
+            fetch(`${API_BASE}/applications`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    jobId: parseInt(jobId),
+                    userId: parseInt(userId),
+                    coverLetter: coverLetter,
+                    resumeUrl: resumeUrl
+                })
+            }).catch(() => {});
+
+            alert("Application submitted successfully!");
+            window.location.href = "my-applications.html";
+        }
+
+        function logout() {
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userName");
+            localStorage.removeItem("userRole");
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>
