@@ -1,15 +1,5 @@
 {
-  "version": 2,
-  "cleanUrls": true,
-  "trailingSlash": false,
   "rewrites": [
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/register", "destination": "/register.html" },
-    { "source": "/jobs", "destination": "/jobs.html" },
-    { "source": "/job-details", "destination": "/job-details.html" },
-    { "source": "/my-applications", "destination": "/my-applications.html" },
-    { "source": "/recruiter-dashboard", "destination": "/recruiter-dashboard.html" },
-    { "source": "/admin-dashboard", "destination": "/admin-dashboard.html" },
-    { "source": "/add-job", "destination": "/add-job.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
