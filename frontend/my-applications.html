@@ -82,11 +82,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Core JobHub Store -->
-    <script src="script.js"></script>
-
     <script>
         const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
             ? "http://localhost:8080/api"
@@ -107,10 +102,50 @@
             loadApplications();
         });
 
-        function renderApplicationCards(apps) {
-            updateCounts(apps);
+        const FALLBACK_JOBS_MAP = {
+            1: { title: "Senior Full-Stack Developer", company: "TechCorp Inc.", location: "Remote / San Francisco", salary: "$140,000 - $165,000" },
+            2: { title: "UI/UX Product Designer", company: "NextGen AI", location: "San Francisco, CA", salary: "$115,000 - $135,000" },
+            3: { title: "Machine Learning Researcher", company: "NextGen AI", location: "Remote", salary: "$155,000 - $185,000" },
+            4: { title: "DevOps & Cloud Engineer", company: "TechCorp Inc.", location: "New York, NY", salary: "$130,000 - $150,000" },
+            5: { title: "Technical Product Manager", company: "InnovateLabs", location: "Hybrid (Chicago, IL)", salary: "$120,000 - $140,000" },
+            6: { title: "Frontend React Specialist", company: "CloudScale Technologies", location: "Remote", salary: "$100,000 - $120,000" }
+        };
 
-            if (!apps || apps.length === 0) {
+        function loadApplications() {
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+
+            fetch(`${API_BASE}/applications/user/${userId}`, controller ? { signal: controller.signal } : {})
+                .then(res => {
+                    if (timeoutId) clearTimeout(timeoutId);
+                    if (!res.ok) throw new Error("HTTP " + res.status);
+                    return res.json();
+                })
+                .then(apps => {
+                    renderApplications(apps);
+                })
+                .catch(err => {
+                    if (timeoutId) clearTimeout(timeoutId);
+                    console.warn("Backend unreachable/slow. Displaying local applications:", err);
+                    renderApplications([]);
+                });
+        }
+
+        function renderApplications(fetchedApps) {
+            const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+            const userLocalApps = localApps.filter(a => a.userId == userId);
+
+            // Merge fetched and local applications (deduplicate by jobId)
+            const appMap = {};
+            userLocalApps.forEach(a => appMap[a.jobId] = a);
+            if (Array.isArray(fetchedApps)) {
+                fetchedApps.forEach(a => appMap[a.jobId] = a);
+            }
+
+            const combinedApps = Object.values(appMap);
+            updateCounts(combinedApps);
+
+            if (combinedApps.length === 0) {
                 document.getElementById("applicationsContainer").innerHTML = `
                     <div class="glass-card p-5 text-center">
                         <i class="fas fa-file-invoice text-secondary fa-3x mb-3"></i>
@@ -123,14 +158,9 @@
             }
 
             let html = "";
-            apps.forEach(app => {
-                const job = (window.JobHubStore && JobHubStore.getJobById(app.jobId)) || {
-                    title: "Position #" + app.jobId,
-                    company: "Company",
-                    location: "Remote",
-                    salary: "Competitive"
-                };
-
+            combinedApps.forEach(app => {
+                const job = FALLBACK_JOBS_MAP[app.jobId] || { title: "Job Position #" + app.jobId, company: "Tech Company", location: "Remote", salary: "Competitive" };
+                
                 let badgeHtml = "";
                 const st = (app.status || "PENDING").toUpperCase();
                 if (st === "ACCEPTED") {
@@ -163,7 +193,7 @@
                             <div class="col-md-5 d-flex flex-column align-items-md-end justify-content-between gap-2">
                                 <div>${badgeHtml}</div>
                                 <span class="text-muted small"><i class="far fa-calendar-alt me-1"></i>Applied: ${app.appliedDate || 'Recently'}</span>
-                                <button onclick="cancelApp(${app.id})" class="btn btn-outline-danger btn-sm px-3 mt-1">
+                                <button onclick="cancelApp(${app.id || app.jobId})" class="btn btn-outline-danger btn-sm px-3 mt-1">
                                     <i class="fas fa-trash-alt me-1"></i> Cancel Application
                                 </button>
                             </div>
@@ -175,42 +205,10 @@
             document.getElementById("applicationsContainer").innerHTML = html;
         }
 
-        function loadApplications() {
-            // Immediately render from local JobHubStore so it NEVER shows 0 or spins forever!
-            if (window.JobHubStore) {
-                const localApps = JobHubStore.getUserApplications(userId);
-                renderApplicationCards(localApps);
-            }
-
-            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
-
-            fetch(`${API_BASE}/applications/user/${userId}`, { signal: controller ? controller.signal : null })
-                .then(res => {
-                    if (timeoutId) clearTimeout(timeoutId);
-                    if (!res.ok) throw new Error("HTTP error " + res.status);
-                    return res.json();
-                })
-                .then(async apps => {
-                    if (Array.isArray(apps) && apps.length > 0) {
-                        apps.forEach(a => { if (window.JobHubStore) JobHubStore.saveApplication(a); });
-                        renderApplicationCards(JobHubStore.getUserApplications(userId));
-                    }
-                })
-                .catch(err => {
-                    if (timeoutId) clearTimeout(timeoutId);
-                    console.warn("Using offline applications fallback:", err);
-                    if (window.JobHubStore) {
-                        renderApplicationCards(JobHubStore.getUserApplications(userId));
-                    }
-                });
-        }
-
         function updateCounts(apps) {
-            const list = apps || [];
-            document.getElementById("cntTotal").innerText = list.length;
+            document.getElementById("cntTotal").innerText = apps.length;
             let pending = 0, accepted = 0, rejected = 0;
-            list.forEach(a => {
+            apps.forEach(a => {
                 const s = (a.status || "PENDING").toUpperCase();
                 if (s === "ACCEPTED") accepted++;
                 else if (s === "REJECTED") rejected++;
@@ -224,9 +222,9 @@
         function cancelApp(id) {
             if (!confirm("Are you sure you want to cancel this application?")) return;
 
-            if (window.JobHubStore) {
-                JobHubStore.deleteApplication(id);
-            }
+            const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+            const updated = localApps.filter(a => a.id != id && a.jobId != id);
+            localStorage.setItem("local_applications", JSON.stringify(updated));
 
             fetch(`${API_BASE}/applications/${id}`, { method: "DELETE" }).catch(() => {});
             alert("Application cancelled.");
