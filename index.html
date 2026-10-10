@@ -323,8 +323,12 @@
 
         // Fetch all jobs
         function loadJobs() {
+            const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
+            allJobs = [...FALLBACK_JOBS, ...localJobs];
+            renderJobs(allJobs);
+
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 5000) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 2000) : null;
 
             fetch(`${API_BASE}/jobs`, controller ? { signal: controller.signal } : {})
                 .then(res => {
@@ -333,22 +337,13 @@
                     return res.json();
                 })
                 .then(data => {
-                    allJobs = data;
-                    renderJobs(allJobs);
+                    if (Array.isArray(data) && data.length > 0) {
+                        allJobs = [...data, ...localJobs];
+                        renderJobs(allJobs);
+                    }
                 })
                 .catch(err => {
                     if (timeoutId) clearTimeout(timeoutId);
-                    console.warn("Backend server slow or sleeping. Displaying fallback sample jobs:", err);
-                    allJobs = FALLBACK_JOBS;
-                    renderJobs(allJobs);
-
-                    // Background retry to connect when Render wakes up
-                    setTimeout(() => {
-                        fetch(`${API_BASE}/jobs`)
-                            .then(r => r.ok ? r.json() : null)
-                            .then(d => { if (d && d.length) { allJobs = d; renderJobs(allJobs); } })
-                            .catch(() => {});
-                    }, 5000);
                 });
         }
 
