@@ -31,48 +31,70 @@ const Recruiter = {
 
     async loadData() {
         const user = Auth.getUser();
-        let jobs = [];
+
+        // 1. Instant local/fallback render (0ms delay)
+        const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
+        const fallbackJobs = typeof FALLBACK_JOBS !== 'undefined' ? FALLBACK_JOBS : [];
+        const baseJobs = [...fallbackJobs, ...localJobs];
+        const initialRecruiterJobs = user.role === "ADMIN" 
+            ? baseJobs 
+            : baseJobs.filter(j => !j.recruiterId || j.recruiterId === user.id);
+
+        const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+        const initialRecruiterJobIds = new Set(initialRecruiterJobs.map(j => j.id));
+        const initialRelevantApps = localApps.filter(a => initialRecruiterJobIds.has(a.jobId));
+
+        const cntListings = document.getElementById("cntListings");
+        const cntTotalApps = document.getElementById("cntTotalApps");
+        const cntPendingApps = document.getElementById("cntPendingApps");
+
+        if (cntListings) cntListings.innerText = initialRecruiterJobs.length;
+        if (cntTotalApps) cntTotalApps.innerText = initialRelevantApps.length;
+        if (cntPendingApps) cntPendingApps.innerText = initialRelevantApps.filter(a => (a.status || 'PENDING').toUpperCase() === 'PENDING').length;
+
+        this.renderJobs(initialRecruiterJobs, initialRelevantApps);
+
+        // 2. Concurrently fetch remote data with 1.5s timeout
+        let remoteJobs = [];
+        let remoteApps = [];
 
         try {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = setTimeout(() => controller && controller.abort(), 2500);
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 1500) : null;
 
-            const res = await fetch(`${API_BASE}/jobs`, controller ? { signal: controller.signal } : {});
-            clearTimeout(timeoutId);
+            const [jobsRes, appsRes] = await Promise.allSettled([
+                fetch(`${API_BASE}/jobs`, controller ? { signal: controller.signal } : {}),
+                fetch(`${API_BASE}/applications`, controller ? { signal: controller.signal } : {})
+            ]);
+            if (timeoutId) clearTimeout(timeoutId);
 
-            if (res.ok) jobs = await res.json();
+            if (jobsRes.status === "fulfilled" && jobsRes.value.ok) {
+                remoteJobs = await jobsRes.value.json();
+            }
+            if (appsRes.status === "fulfilled" && appsRes.value.ok) {
+                remoteApps = await appsRes.value.json();
+            }
         } catch (e) {
-            console.log("Using cached/fallback jobs for recruiter:", e.message);
+            console.log("Using cached/fallback data for recruiter:", e.message);
         }
 
-        const localJobs = JSON.parse(localStorage.getItem("local_jobs") || "[]");
-        const combinedJobs = [...jobs, ...localJobs];
-        
-        // Filter jobs by current recruiter if not admin
+        const combinedJobs = (Array.isArray(remoteJobs) && remoteJobs.length > 0)
+            ? [...remoteJobs, ...localJobs]
+            : baseJobs;
+
         const recruiterJobs = user.role === "ADMIN" 
             ? combinedJobs 
             : combinedJobs.filter(j => !j.recruiterId || j.recruiterId === user.id);
 
-        // Fetch applications
-        let remoteApps = [];
-        try {
-            const appsRes = await fetch(`${API_BASE}/applications`);
-            if (appsRes.ok) remoteApps = await appsRes.json();
-        } catch (e) {}
-
-        const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
         const appMap = {};
         localApps.forEach(a => { appMap[a.id || (a.jobId + '-' + a.userId)] = a; });
-        remoteApps.forEach(a => { appMap[a.id || (a.jobId + '-' + a.userId)] = a; });
+        if (Array.isArray(remoteApps)) {
+            remoteApps.forEach(a => { appMap[a.id || (a.jobId + '-' + a.userId)] = a; });
+        }
         const allApps = Object.values(appMap);
 
         const recruiterJobIds = new Set(recruiterJobs.map(j => j.id));
         const relevantApps = allApps.filter(a => recruiterJobIds.has(a.jobId));
-
-        // Update stats
-        const cntListings = document.getElementById("cntListings");
-        const cntTotalApps = document.getElementById("cntTotalApps");
-        const cntPendingApps = document.getElementById("cntPendingApps");
 
         if (cntListings) cntListings.innerText = recruiterJobs.length;
         if (cntTotalApps) cntTotalApps.innerText = relevantApps.length;
@@ -204,10 +226,15 @@ const Recruiter = {
         let users = [];
 
         try {
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 1500) : null;
+
             const [appsRes, usersRes] = await Promise.all([
-                fetch(`${API_BASE}/applications/job/${jobId}`).catch(() => null),
-                fetch(`${API_BASE}/users`).catch(() => null)
+                fetch(`${API_BASE}/applications/job/${jobId}`, controller ? { signal: controller.signal } : {}).catch(() => null),
+                fetch(`${API_BASE}/users`, controller ? { signal: controller.signal } : {}).catch(() => null)
             ]);
+            if (timeoutId) clearTimeout(timeoutId);
+
             if (appsRes && appsRes.ok) remoteApps = await appsRes.json();
             if (usersRes && usersRes.ok) users = await usersRes.json();
         } catch (e) {}
