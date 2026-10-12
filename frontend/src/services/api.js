@@ -118,10 +118,16 @@ export async function submitApplication(appData) {
     localStorage.setItem("local_applications", JSON.stringify(localApps));
 
     try {
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 1500) : null;
         await fetch(`${API_BASE}/applications`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(appData)
+            body: JSON.stringify(appData),
+            signal: controller ? controller.signal : null
         });
-    } catch (e) {}
+        if (timeoutId) clearTimeout(timeoutId);
+    } catch (e) {
+        console.warn("Backend sync skipped (offline mode):", e);
+    }
 }
