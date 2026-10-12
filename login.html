@@ -213,9 +213,12 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-            ? "http://localhost:8080/api"
-            : "https://jobhub-backend.onrender.com/api";
+        // API_BASE is provided globally by js/config.js. Fallback if not loaded:
+        if (typeof API_BASE === 'undefined') {
+            window.API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "")
+                ? "http://localhost:8080/api"
+                : "https://jobhub-backend.onrender.com/api";
+        }
 
         function switchTab(tab) {
             const loginForm = document.getElementById("loginForm");
@@ -248,8 +251,10 @@
 
         const DEMO_ACCOUNTS = {
             "admin@jobhub.com": { id: 1, name: "System Administrator", email: "admin@jobhub.com", role: "ADMIN", password: "password" },
+            "recruiter@jobhub.com": { id: 2, name: "Sarah Jenkins", email: "recruiter@jobhub.com", role: "RECRUITER", password: "password" },
             "techcorp@jobs.com": { id: 2, name: "Sarah Jenkins", email: "techcorp@jobs.com", role: "RECRUITER", password: "password" },
             "nextgen@jobs.com": { id: 3, name: "Marcus Vance", email: "nextgen@jobs.com", role: "RECRUITER", password: "password" },
+            "user@jobhub.com": { id: 3, name: "Varshitha Goud", email: "user@jobhub.com", role: "JOB_SEEKER", password: "password" },
             "alex@seeker.com": { id: 4, name: "Alex Johnson", email: "alex@seeker.com", role: "JOB_SEEKER", password: "password" },
             "elena@seeker.com": { id: 5, name: "Elena Rostova", email: "elena@seeker.com", role: "JOB_SEEKER", password: "password" }
         };
@@ -275,7 +280,7 @@
             const matchedLocalUser = localUsers[email];
 
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 1500) : null;
 
             fetch(`${API_BASE}/users/login`, {
                 method: "POST",
@@ -291,7 +296,8 @@
                 if (!res.ok) throw new Error(typeof data === 'object' && data.message ? data.message : (typeof data === 'string' ? data : "Invalid credentials"));
                 return data;
             })
-            .then(user => {
+            .then(data => {
+                const user = (data && data.user) ? data.user : data;
                 proceedLogin(user);
             })
             .catch(err => {
@@ -313,10 +319,10 @@
 
         function proceedLogin(user) {
             const msg = document.getElementById("loginMessage");
-            localStorage.setItem("userId", user.id);
-            localStorage.setItem("userName", user.name);
-            localStorage.setItem("userEmail", user.email);
-            localStorage.setItem("userRole", user.role);
+            localStorage.setItem("userId", user.id || "1");
+            localStorage.setItem("userName", user.name || (user.email ? user.email.split('@')[0] : "User"));
+            localStorage.setItem("userEmail", user.email || "");
+            localStorage.setItem("userRole", user.role || "JOB_SEEKER");
 
             msg.innerHTML = `<span class="text-emerald-400 font-semibold"><i class="fas fa-check-circle mr-1"></i> Success! Redirecting...</span>`;
 

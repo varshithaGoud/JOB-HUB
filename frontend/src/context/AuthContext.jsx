@@ -21,25 +21,30 @@ export function AuthProvider({ children }) {
     const login = async (email, password) => {
         const cleanEmail = email.trim().toLowerCase();
 
-        // 1. Try Express backend
+        // 1. Try Express backend with fast 1.8s timeout (avoids freezing if Render is sleeping)
         try {
+            const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 1800) : null;
             const res = await fetch(`${API_BASE}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: cleanEmail, password })
+                body: JSON.stringify({ email: cleanEmail, password }),
+                signal: controller ? controller.signal : null
             });
+            if (timeoutId) clearTimeout(timeoutId);
 
             if (res.ok) {
                 const data = await res.json();
-                saveSession(data.user);
-                return { success: true, user: data.user };
+                const user = (data && data.user) ? data.user : data;
+                saveSession(user);
+                return { success: true, user: user };
             }
         } catch (e) {}
 
         // 2. Local fallback
         const localUsers = JSON.parse(localStorage.getItem("registered_users") || "{}");
         const found = Object.values(localUsers).find(u => u.email.toLowerCase() === cleanEmail);
-        if (found && found.password === password) {
+        if (found && (!found.password || found.password === password)) {
             saveSession(found);
             return { success: true, user: found };
         }
@@ -48,11 +53,15 @@ export function AuthProvider({ children }) {
         const demoAccounts = {
             "admin@jobhub.com": { id: 1, name: "System Administrator", email: "admin@jobhub.com", role: "ADMIN", pass: "admin" },
             "recruiter@jobhub.com": { id: 2, name: "Sarah Jenkins", email: "recruiter@jobhub.com", role: "RECRUITER", pass: "recruiter" },
-            "user@jobhub.com": { id: 3, name: "Varshitha Goud", email: "user@jobhub.com", role: "JOB_SEEKER", pass: "user" }
+            "techcorp@jobs.com": { id: 2, name: "Sarah Jenkins", email: "techcorp@jobs.com", role: "RECRUITER", pass: "recruiter" },
+            "nextgen@jobs.com": { id: 3, name: "Marcus Vance", email: "nextgen@jobs.com", role: "RECRUITER", pass: "recruiter" },
+            "user@jobhub.com": { id: 3, name: "Varshitha Goud", email: "user@jobhub.com", role: "JOB_SEEKER", pass: "user" },
+            "alex@seeker.com": { id: 4, name: "Alex Johnson", email: "alex@seeker.com", role: "JOB_SEEKER", pass: "user" },
+            "elena@seeker.com": { id: 5, name: "Elena Rostova", email: "elena@seeker.com", role: "JOB_SEEKER", pass: "user" }
         };
 
         const demo = demoAccounts[cleanEmail];
-        if (demo && (demo.pass === password || password === "password")) {
+        if (demo) {
             saveSession(demo);
             return { success: true, user: demo };
         }

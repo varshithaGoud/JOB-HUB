@@ -196,78 +196,11 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") 
-            ? "http://localhost:8080/api" 
-            : "https://jobhub-backend.onrender.com/api";
-
-        const FALLBACK_JOBS = [
-            {
-                id: 1,
-                title: "Senior Full Stack Engineer",
-                company: "Google",
-                location: "Mountain View, CA (Hybrid)",
-                salary: "$165,000 - $195,000",
-                jobType: "Full Time",
-                category: "Engineering",
-                description: "Design and scale resilient web platforms using Spring Boot, React, and cloud native architectures. Mentor engineers and conduct architectural reviews.",
-                postedDate: "Just now"
-            },
-            {
-                id: 2,
-                title: "Lead UI/UX Product Designer",
-                company: "Airbnb",
-                location: "San Francisco, CA (Remote)",
-                salary: "$140,000 - $170,000",
-                jobType: "Remote",
-                category: "Design",
-                description: "Craft modern, accessible, and high-conversion interfaces for millions of global travelers. Drive our modern design token system and user research.",
-                postedDate: "2 hours ago"
-            },
-            {
-                id: 3,
-                title: "DevOps & Cloud Architect",
-                company: "Netflix",
-                location: "Los Gatos, CA",
-                salary: "$180,000 - $220,000",
-                jobType: "Full Time",
-                category: "Engineering",
-                description: "Scale high-throughput streaming pipelines with Kubernetes, Terraform, AWS, and distributed telemetry. Optimize edge latency and fault recovery.",
-                postedDate: "1 day ago"
-            },
-            {
-                id: 4,
-                title: "AI & Machine Learning Engineer",
-                company: "OpenAI",
-                location: "San Francisco, CA (Hybrid)",
-                salary: "$200,000 - $260,000",
-                jobType: "Full Time",
-                category: "Data & AI",
-                description: "Build scalable training pipelines, inference optimization, and developer toolkits for cutting-edge multimodal intelligence models.",
-                postedDate: "2 days ago"
-            },
-            {
-                id: 5,
-                title: "Technical Product Manager",
-                company: "Stripe",
-                location: "Seattle, WA (Remote)",
-                salary: "$150,000 - $185,000",
-                jobType: "Remote",
-                category: "Product",
-                description: "Drive strategy and developer experience for global billing and payout APIs. Work alongside engineering and top fintech merchant partners.",
-                postedDate: "3 days ago"
-            },
-            {
-                id: 6,
-                title: "Growth Marketing Specialist",
-                company: "Spotify",
-                location: "New York, NY",
-                salary: "$110,000 - $135,000",
-                jobType: "Full Time",
-                category: "Marketing",
-                description: "Execute user acquisition campaigns, optimize funnels, and analyze listener retention metrics across digital channels and podcasts.",
-                postedDate: "4 days ago"
-            }
-        ];
+        if (typeof API_BASE === 'undefined') {
+            window.API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "")
+                ? "http://localhost:8080/api"
+                : "https://jobhub-backend.onrender.com/api";
+        }
 
         let currentJob = null;
         let jobId = new URLSearchParams(window.location.search).get("id") || "1";

@@ -144,9 +144,12 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        const API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-            ? "http://localhost:8080/api"
-            : "https://jobhub-backend.onrender.com/api";
+        // API_BASE is provided globally by js/config.js. Fallback if not loaded:
+        if (typeof API_BASE === 'undefined') {
+            window.API_BASE = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "")
+                ? "http://localhost:8080/api"
+                : "https://jobhub-backend.onrender.com/api";
+        }
 
         const DEMO_ACCOUNTS = {
             "admin@jobhub.com": { id: 1, name: "System Administrator", email: "admin@jobhub.com", role: "ADMIN", password: "password" },

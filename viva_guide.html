@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobHub - Comprehensive Project & Viva Defense Guide</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.6cm 1.4cm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.6;
+            font-size: 10.5pt;
+        }
+
+        .cover-page {
+            page-break-after: always;
+            padding-top: 4cm;
+            text-align: center;
+        }
+
+        .badge-pill {
+            display: inline-block;
+            background: #eef2ff;
+            color: #4f46e5;
+            font-weight: 700;
+            font-size: 9pt;
+            letter-spacing: 1px;
+            padding: 4px 14px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border: 1px solid #c7d2fe;
+        }
+
+        .main-title {
+            font-size: 28pt;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 13pt;
+            color: #64748b;
+            margin-bottom: 40px;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .meta-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 18px 24px;
+            display: inline-block;
+            text-align: left;
+            margin-top: 20px;
+            font-size: 10pt;
+        }
+
+        .meta-box table td {
+            padding: 4px 10px;
+        }
+
+        .meta-box table td:first-child {
+            font-weight: 700;
+            color: #475569;
+        }
+
+        h1 {
+            font-size: 18pt;
+            color: #0f172a;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 6px;
+            margin-top: 24pt;
+            margin-bottom: 12pt;
+            page-break-after: avoid;
+        }
+
+        h2 {
+            font-size: 13pt;
+            color: #334155;
+            margin-top: 16pt;
+            margin-bottom: 8pt;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 11pt;
+            color: #4f46e5;
+            margin-top: 12pt;
+            margin-bottom: 6pt;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin-bottom: 8pt;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 10pt;
+        }
+
+        li {
+            margin-bottom: 4pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12pt 0;
+            font-size: 9pt;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 7px 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .card {
+            background: #f8fafc;
+            border-left: 4px solid #4f46e5;
+            border-radius: 4px;
+            padding: 10pt 12pt;
+            margin-bottom: 12pt;
+            page-break-inside: avoid;
+        }
+
+        .qa-item {
+            margin-bottom: 14pt;
+            page-break-inside: avoid;
+        }
+
+        .question {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4pt;
+            font-size: 10pt;
+        }
+
+        .answer {
+            background-color: #f8fafc;
+            border-left: 3px solid #6366f1;
+            padding: 6pt 10pt;
+            color: #334155;
+            font-size: 9.5pt;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .code-inline {
+            font-family: Consolas, "Courier New", monospace;
+            background: #e2e8f0;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 8.5pt;
+            color: #0f172a;
+        }
+
+        .badge-status {
+            font-size: 7.5pt;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-review { background: #e0f2fe; color: #0369a1; }
+        .status-accepted { background: #dcfce7; color: #166534; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER PAGE -->
+    <div class="cover-page">
+        <div class="badge-pill">Project Defense & Viva Preparation</div>
+        <div class="main-title">💼 JobHub</div>
+        <div class="subtitle">Enterprise Job Search, Applicant Tracking & Talent Recruitment Platform</div>
+        
+        <div class="meta-box">
+            <table>
+                <tr>
+                    <td>Domain:</td>
+                    <td>Web Engineering & Cloud Recruitment Systems (ATS)</td>
+                </tr>
+                <tr>
+                    <td>Architecture:</td>
+                    <td>Decoupled 3-Tier Client-Server REST Architecture</td>
+                </tr>
+                <tr>
+                    <td>Frontend:</td>
+                    <td>React 19, Vite, Tailwind CSS, React Router 7</td>
+                </tr>
+                <tr>
+                    <td>Backend:</td>
+                    <td>Spring Boot 4.1 (Java 17), Spring Data JPA, H2 In-Memory DB</td>
+                </tr>
+                <tr>
+                    <td>Document Type:</td>
+                    <td>Technical Documentation & Viva Defense Guide</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <h1>1. Executive Summary & Problem Statement</h1>
+    <p><strong>JobHub</strong> is a full-stack, enterprise-grade recruitment management platform designed to eliminate inefficiencies in modern hiring workflows. It delivers a unified, role-based solution connecting <strong>Job Seekers (Candidates)</strong>, <strong>Recruiters (Hiring Managers)</strong>, and <strong>Platform Administrators</strong>.</p>
+    
+    <div class="card">
+        <strong>The Problem Addressed:</strong>
+        <p style="margin-top: 4pt; margin-bottom: 0;">Traditional recruitment workflows suffer from fragmented applicant tracking where candidate resumes disappear into untracked queues without status transparency. Meanwhile, recruiters lack lightweight, rapid applicant screening tools, and system administrators lack cross-platform governance and telemetry.</p>
+    </div>
+
+    <div class="card" style="border-left-color: #10b981;">
+        <strong>The JobHub Solution:</strong>
+        <ul style="margin-top: 4pt; margin-bottom: 0;">
+            <li><strong>Candidates:</strong> Instant keyword/category filtering, 1-click interactive application modal with cover letter and portfolio submission, and a live visual application progression tracker.</li>
+            <li><strong>Recruiters:</strong> Rapid posting of vacancies with compensation brackets, review queue modal, and 1-click candidate decision buttons (<span class="badge-status status-accepted">ACCEPTED</span> / <span class="badge-status status-rejected">REJECTED</span>).</li>
+            <li><strong>Administrators:</strong> Comprehensive platform telemetry, user account moderation, and universal listing auditing.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2 -->
+    <h1>2. System Architecture & Data Flow</h1>
+    <p>JobHub is architected according to the <strong>Decoupled 3-Tier Client-Server Architecture</strong> pattern:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Tier</th>
+                <th>Technology</th>
+                <th>Responsibilities</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Presentation Tier</strong></td>
+                <td>React 19 SPA, Vite, Tailwind CSS</td>
+                <td>Declarative UI rendering, client-side route transitions, form validations, optimistic state updates, and graceful offline fallback.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Application / Business Logic Tier</strong></td>
+                <td>Spring Boot 4.1, Spring MVC</td>
+                <td>RESTful API controllers, business rule validation (duplicate prevention), role enforcement, and payload transformation.</td>
+            </tr>
+            <tr>
+                <td><strong>3. Data Persistence Tier</strong></td>
+                <td>Spring Data JPA, Hibernate, H2 Database</td>
+                <td>Object-Relational Mapping (ORM), schema generation, transaction management, and relational SQL persistence.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="card">
+        <strong>Request Lifecycle Walkthrough:</strong>
+        <ol style="margin-top: 4pt; margin-bottom: 0;">
+            <li>Candidate triggers application submission via React UI modal.</li>
+            <li>Frontend dispatches an HTTP <span class="code-inline">POST /api/applications</span> with JSON payload to the REST endpoint.</li>
+            <li><span class="code-inline">ApplicationController</span> validates the incoming request and delegates execution to <span class="code-inline">ApplicationService</span>.</li>
+            <li><span class="code-inline">ApplicationService</span> queries <span class="code-inline">ApplicationRepository</span> to ensure the user has not previously applied for this listing.</li>
+            <li>If valid, the entity is persisted to H2 DB via Hibernate and returns HTTP <span class="code-inline">200 OK</span>.</li>
+            <li>Candidate dashboard updates status badge to <span class="badge-status status-pending">PENDING</span> in real time.</li>
+        </ol>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 3 -->
+    <h1>3. Technology Stack Breakdown</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Technology</th>
+                <th>Architectural Justification</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Frontend Framework</strong></td>
+                <td>React 19</td>
+                <td>Virtual DOM diffing, component reusability, reactive state hooks, and declarative rendering.</td>
+            </tr>
+            <tr>
+                <td><strong>Build Bundler</strong></td>
+                <td>Vite</td>
+                <td>Native ES Modules (ESM) support providing sub-second Hot Module Replacement (HMR).</td>
+            </tr>
+            <tr>
+                <td><strong>Client Routing</strong></td>
+                <td>React Router 7</td>
+                <td>Client-side routing via HTML5 History API, enabling instantaneous page changes without reloads.</td>
+            </tr>
+            <tr>
+                <td><strong>Styling & Theme</strong></td>
+                <td>Tailwind CSS</td>
+                <td>Utility-first styling with dark-mode aesthetic, micro-animations, and minimal CSS production footprint.</td>
+            </tr>
+            <tr>
+                <td><strong>Backend Framework</strong></td>
+                <td>Spring Boot 4.1 (Java 17)</td>
+                <td>Rapid production-ready REST services with embedded Tomcat and zero-boilerplate auto-configuration.</td>
+            </tr>
+            <tr>
+                <td><strong>Persistence & ORM</strong></td>
+                <td>Spring Data JPA / Hibernate</td>
+                <td>Declarative database repositories, automatic query generation, and schema synchronization.</td>
+            </tr>
+            <tr>
+                <td><strong>Database Engine</strong></td>
+                <td>H2 In-Memory Database</td>
+                <td>Embedded zero-setup relational DB with accessible web console (<span class="code-inline">/h2-console</span>).</td>
+            </tr>
+            <tr>
+                <td><strong>Alternative Backend</strong></td>
+                <td>Express.js / Node.js</td>
+                <td>Secondary REST API alternative (<span class="code-inline">server.js</span>) for quick local development.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- SECTION 4 -->
+    <h1>4. Database Schema & Data Models</h1>
+
+    <h3>1. User Entity (Table: <span class="code-inline">users</span>)</h3>
+    <table>
+        <thead>
+            <tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="code-inline">id</span></td><td>BIGINT</td><td>PRIMARY KEY, AUTO_INCREMENT</td><td>Unique user identifier</td></tr>
+            <tr><td><span class="code-inline">name</span></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Full name of user</td></tr>
+            <tr><td><span class="code-inline">email</span></td><td>VARCHAR(255)</td><td>UNIQUE, NOT NULL</td><td>Account email address</td></tr>
+            <tr><td><span class="code-inline">password</span></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Account password</td></tr>
+            <tr><td><span class="code-inline">role</span></td><td>VARCHAR(50)</td><td>NOT NULL</td><td><span class="code-inline">JOB_SEEKER</span>, <span class="code-inline">RECRUITER</span>, <span class="code-inline">ADMIN</span></td></tr>
+            <tr><td><span class="code-inline">title</span></td><td>VARCHAR(255)</td><td>NULLABLE</td><td>Professional title / role</td></tr>
+            <tr><td><span class="code-inline">bio</span></td><td>VARCHAR(1000)</td><td>NULLABLE</td><td>Short background bio</td></tr>
+        </tbody>
+    </table>
+
+    <h3>2. Job Entity (Table: <span class="code-inline">jobs</span>)</h3>
+    <table>
+        <thead>
+            <tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="code-inline">id</span></td><td>BIGINT</td><td>PRIMARY KEY, AUTO_INCREMENT</td><td>Unique job identifier</td></tr>
+            <tr><td><span class="code-inline">title</span></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Job position title</td></tr>
+            <tr><td><span class="code-inline">company</span></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Hiring organization name</td></tr>
+            <tr><td><span class="code-inline">location</span></td><td>VARCHAR(255)</td><td>NOT NULL</td><td>Job location / Remote tag</td></tr>
+            <tr><td><span class="code-inline">salary</span></td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Compensation range bracket</td></tr>
+            <tr><td><span class="code-inline">jobType</span></td><td>VARCHAR(50)</td><td>NOT NULL</td><td>Full Time, Part Time, Remote, Contract</td></tr>
+            <tr><td><span class="code-inline">category</span></td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Engineering, Design, AI, Product, Marketing</td></tr>
+            <tr><td><span class="code-inline">recruiterId</span></td><td>BIGINT</td><td>INDEXED</td><td>Identifier of hiring recruiter</td></tr>
+            <tr><td><span class="code-inline">description</span></td><td>VARCHAR(2000)</td><td>NOT NULL</td><td>Full job description & responsibilities</td></tr>
+            <tr><td><span class="code-inline">postedDate</span></td><td>DATE</td><td>NOT NULL</td><td>Publication date timestamp</td></tr>
+        </tbody>
+    </table>
+
+    <h3>3. Application Entity (Table: <span class="code-inline">applications</span>)</h3>
+    <table>
+        <thead>
+            <tr><th>Column</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="code-inline">id</span></td><td>BIGINT</td><td>PRIMARY KEY, AUTO_INCREMENT</td><td>Unique application identifier</td></tr>
+            <tr><td><span class="code-inline">jobId</span></td><td>BIGINT</td><td>INDEXED, NOT NULL</td><td>Referenced job posting</td></tr>
+            <tr><td><span class="code-inline">userId</span></td><td>BIGINT</td><td>INDEXED, NOT NULL</td><td>Referenced applicant user</td></tr>
+            <tr><td><span class="code-inline">status</span></td><td>VARCHAR(50)</td><td>NOT NULL</td><td><span class="code-inline">PENDING</span>, <span class="code-inline">UNDER_REVIEW</span>, <span class="code-inline">ACCEPTED</span>, <span class="code-inline">REJECTED</span></td></tr>
+            <tr><td><span class="code-inline">appliedDate</span></td><td>DATE</td><td>NOT NULL</td><td>Submission timestamp</td></tr>
+            <tr><td><span class="code-inline">coverLetter</span></td><td>VARCHAR(1500)</td><td>NULLABLE</td><td>Candidate pitch note</td></tr>
+            <tr><td><span class="code-inline">resumeUrl</span></td><td>VARCHAR(255)</td><td>NULLABLE</td><td>Portfolio / resume URL link</td></tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 5 -->
+    <h1>5. REST API Endpoints Specification</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Access Role</th>
+                <th>Functionality</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><span class="code-inline">POST</span></td><td>/api/users/register</td><td>Public</td><td>Registers candidate, recruiter, or admin accounts</td></tr>
+            <tr><td><span class="code-inline">POST</span></td><td>/api/users/login</td><td>Public</td><td>Authenticates credentials and returns user profile & role</td></tr>
+            <tr><td><span class="code-inline">GET</span></td><td>/api/users</td><td>Admin</td><td>Retrieves list of all registered platform accounts</td></tr>
+            <tr><td><span class="code-inline">DELETE</span></td><td>/api/users/{id}</td><td>Admin</td><td>Moderates platform by deleting specified account</td></tr>
+            <tr><td><span class="code-inline">GET</span></td><td>/api/jobs</td><td>Public</td><td>Lists all active jobs (supports <span class="code-inline">?category=</span> filter)</td></tr>
+            <tr><td><span class="code-inline">GET</span></td><td>/api/jobs/{id}</td><td>Public</td><td>Retrieves detailed job specifications by ID</td></tr>
+            <tr><td><span class="code-inline">GET</span></td><td>/api/jobs/recruiter/{id}</td><td>Recruiter</td><td>Lists job postings created by a specific recruiter</td></tr>
+            <tr><td><span class="code-inline">POST</span></td><td>/api/jobs</td><td>Recruiter</td><td>Publishes a new job opening to the network</td></tr>
+            <tr><td><span class="code-inline">DELETE</span></td><td>/api/jobs/{id}</td><td>Recruiter / Admin</td><td>Removes job opening from active listings</td></tr>
+            <tr><td><span class="code-inline">POST</span></td><td>/api/applications</td><td>Candidate</td><td>Submits application (validates duplicate submissions)</td></tr>
+            <tr><td><span class="code-inline">GET</span></td><td>/api/applications/user/{id}</td><td>Candidate</td><td>Retrieves application status history for applicant</td></tr>
+            <tr><td><span class="code-inline">GET</span></td><td>/api/applications/job/{id}</td><td>Recruiter</td><td>Retrieves applicant pool for a specific posting</td></tr>
+            <tr><td><span class="code-inline">PUT</span></td><td>/api/applications/{id}/status</td><td>Recruiter</td><td>Updates status (<span class="code-inline">UNDER_REVIEW</span>, <span class="code-inline">ACCEPTED</span>, <span class="code-inline">REJECTED</span>)</td></tr>
+            <tr><td><span class="code-inline">GET</span></td><td>/api/stats</td><td>Admin</td><td>Platform metrics (<span class="code-inline">totalUsers</span>, <span class="code-inline">totalJobs</span>, <span class="code-inline">totalApplications</span>)</td></tr>
+        </tbody>
+    </table>
+
+    <!-- SECTION 6 -->
+    <h1>6. High Availability & Resilience Architecture</h1>
+    <p>On free cloud container platforms (e.g. Render, Heroku), idle containers spin down and experience cold-start delays of 30-50 seconds. JobHub implements an <strong>Optimistic Client-Side Resilience Architecture</strong> in <span class="code-inline">api.js</span>:</p>
+    
+    <div class="card">
+        <strong>Resilience Mechanism:</strong>
+        <ul>
+            <li>Every network request uses an <span class="code-inline">AbortController</span> with a 2.5-second timeout threshold.</li>
+            <li>If the remote backend responds, live data is rendered and cached into <span class="code-inline">localStorage</span>.</li>
+            <li>If the remote service is spinning up or unreachable, the application falls back immediately to pre-seeded mock jobs and cached user applications.</li>
+            <li><strong>Benefit:</strong> The user and viva evaluators never encounter broken interfaces or infinite loading spinners during presentation.</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 7 -->
+    <h1>7. Comprehensive Viva Defense Q&A</h1>
+
+    <h2>7.1 Project Concept & System Design</h2>
+
+    <div class="qa-item">
+        <div class="question">Q1: What is the core objective of the JobHub project?</div>
+        <div class="answer">JobHub is a recruitment management platform and Applicant Tracking System (ATS) that eliminates communication gaps in hiring. It enables job seekers to discover positions and track application progress in real time, allows recruiters to post openings and review applicant pipelines with one-click decision tools, and provides administrators with system analytics and governance.</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q2: Why did you choose a decoupled 3-Tier Architecture instead of a Monolithic Server-Side Rendered (SSR) approach?</div>
+        <div class="answer">Decoupling separates user interface rendering from backend business logic. This provides three major benefits:
+        1. <strong>Independent Scalability:</strong> The frontend SPA can be hosted on a global CDN (like Vercel) with near-zero latency, while the backend API scales independently on cloud containers.
+        2. <strong>Superior UX:</strong> Client-side routing with React Router eliminates full-page browser reloads.
+        3. <strong>API Reusability:</strong> The REST API can be consumed by multiple clients (web, mobile apps, or third-party integrations) without altering backend code.</div>
+    </div>
+
+    <h2>7.2 Frontend & React 19</h2>
+
+    <div class="qa-item">
+        <div class="question">Q3: What advantages does Vite provide over traditional bundlers like Webpack?</div>
+        <div class="answer">Webpack constructs an entire in-memory bundle of the complete application dependency graph before the development server starts, which scales poorly as the codebase grows. <strong>Vite</strong> leverages native browser ES Modules (ESM) to serve source files on demand with esbuild (written in Go), providing instantaneous dev-server startup and sub-second Hot Module Replacement (HMR).</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q4: How does client-side routing work in React Router 7?</div>
+        <div class="answer">In traditional multi-page web applications, navigation fires an HTTP GET request causing a full page refresh. React Router utilizes the browser's HTML5 History API (<span class="code-inline">window.history.pushState</span>). When a user clicks a link, the route changes in the address bar without contacting the server, and React reconciles the Virtual DOM to mount the target component (e.g. <span class="code-inline">&lt;JobsPage /&gt;</span>).</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q5: What React hooks are used in JobHub and what roles do they play?</div>
+        <div class="answer">
+        1. <span class="code-inline">useState</span>: Stores dynamic component state, such as active category filters, search input terms, and modal visibility flags.<br>
+        2. <span class="code-inline">useEffect</span>: Manages side effects, including dispatching API fetch calls when components mount or filter dependencies change.<br>
+        3. <span class="code-inline">useNavigate</span> / <span class="code-inline">useLocation</span>: Enables programmatic redirection (e.g. redirecting a candidate to <span class="code-inline">/my-applications</span> upon applying).</div>
+    </div>
+
+    <h2>7.3 Backend & Spring Boot (Java 17)</h2>
+
+    <div class="qa-item">
+        <div class="question">Q6: What is Spring Boot and how does it improve over traditional Spring?</div>
+        <div class="answer">Traditional Spring requires extensive XML configuration, manual bean declarations, and external deployment into an application server (e.g. standalone Tomcat). Spring Boot provides <strong>opinionated defaults</strong> with three core pillars:
+        1. <strong>Auto-Configuration:</strong> Guesses and configures required beans based on classpath dependencies.
+        2. <strong>Embedded Server:</strong> Includes an embedded Tomcat server listening directly on port 8080.
+        3. <strong>Starter Dependencies:</strong> Curates compatible dependency sets (e.g. <span class="code-inline">spring-boot-starter-web</span>).</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q7: Explain the difference between <span class="code-inline">@Controller</span> and <span class="code-inline">@RestController</span>.</div>
+        <div class="answer"><span class="code-inline">@Controller</span> is used in traditional Spring MVC to return HTML view template names (resolved by engines like Thymeleaf or JSP). <span class="code-inline">@RestController</span> is a convenience annotation combining <span class="code-inline">@Controller</span> and <span class="code-inline">@ResponseBody</span>. It informs Spring that every handler method will return domain data serialized directly into HTTP JSON responses via Jackson.</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q8: What is Dependency Injection (DI) and how is it used here?</div>
+        <div class="answer">Dependency Injection is a design pattern realizing Inversion of Control (IoC), wherein the Spring IoC container instantiates and injects required dependencies into beans rather than components instantiating them using <span class="code-inline">new</span>. In JobHub, we use <strong>Constructor Injection</strong> (e.g. injecting <span class="code-inline">ApplicationService</span> into <span class="code-inline">ApplicationController</span>), ensuring loose coupling, immutability, and straightforward unit testing.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>7.4 Database, JPA & Hibernate</h2>
+
+    <div class="qa-item">
+        <div class="question">Q9: What is the relationship between JPA and Hibernate?</div>
+        <div class="answer"><strong>JPA (Jakarta Persistence API)</strong> is a formal Java specification defining standard interfaces, annotations (<span class="code-inline">@Entity</span>, <span class="code-inline">@Id</span>, <span class="code-inline">@Table</span>), and ORM rules. <strong>Hibernate</strong> is the concrete implementation of the JPA specification. It translates object operations into dialect-specific SQL, manages connection pooling, handles first-level caching, and synchronizes state with the database.</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q10: Why did you choose H2 In-Memory Database?</div>
+        <div class="answer">H2 is an embedded relational database running directly inside the Java Virtual Machine (JVM). It requires zero server installation, establishes database tables dynamically on startup via Hibernate DDL generation, and includes an embedded web browser console (<span class="code-inline">/h2-console</span>). It is ideal for testing and viva defense because migrating to production MySQL or PostgreSQL requires only updating JDBC credentials in <span class="code-inline">application.properties</span>.</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q11: How does JobHub prevent duplicate job applications?</div>
+        <div class="answer">In <span class="code-inline">ApplicationService</span>, before persisting an application, the service invokes the derived query <span class="code-inline">findByJobIdAndUserId(jobId, userId)</span> from <span class="code-inline">ApplicationRepository</span>. If a matching record is returned, a runtime exception is thrown, which the controller maps to an HTTP <span class="code-inline">400 Bad Request</span> with a message notifying the candidate they have already applied.</div>
+    </div>
+
+    <h2>7.5 REST API & Networking</h2>
+
+    <div class="qa-item">
+        <div class="question">Q12: What is CORS and why is <span class="code-inline">@CrossOrigin</span> configured?</div>
+        <div class="answer"><strong>Cross-Origin Resource Sharing (CORS)</strong> is a browser security protocol that prevents JavaScript code on one origin (e.g. <span class="code-inline">http://localhost:5173</span> or Vercel) from consuming APIs hosted on a different origin or port (e.g. <span class="code-inline">http://localhost:8080</span> or Render). Annotating controllers with <span class="code-inline">@CrossOrigin(origins = "*")</span> adds the appropriate <span class="code-inline">Access-Control-Allow-Origin</span> HTTP header to authorize browser communication.</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q13: What makes an API "RESTful"?</div>
+        <div class="answer">A RESTful API adheres to Representational State Transfer constraints:
+        1. <strong>Statelessness:</strong> Every HTTP request contains all necessary data; the server maintains no client session.
+        2. <strong>Resource-Oriented URIs:</strong> Endpoints represent nouns (<span class="code-inline">/api/jobs</span>, <span class="code-inline">/api/applications</span>).
+        3. <strong>Standard HTTP Verbs:</strong> <span class="code-inline">GET</span> (read), <span class="code-inline">POST</span> (create), <span class="code-inline">PUT</span> (update), <span class="code-inline">DELETE</span> (remove).
+        4. <strong>Standard Representations:</strong> Structured JSON payloads and semantic HTTP status codes.</div>
+    </div>
+
+    <h2>7.6 Security & Role-Based Access Control (RBAC)</h2>
+
+    <div class="qa-item">
+        <div class="question">Q14: How does Role-Based Access Control (RBAC) work in JobHub?</div>
+        <div class="answer">Users belong to one of three roles:
+        * <span class="code-inline">JOB_SEEKER</span>: Restricted to exploring jobs and managing personal submissions.
+        * <span class="code-inline">RECRUITER</span>: Authorized to publish listings, review candidate submissions, and update hiring statuses.
+        * <span class="code-inline">ADMIN</span>: Authorized to view platform-wide telemetry, audit accounts, and remove listings.
+        On the client side, navigation links and action buttons are conditionally rendered based on the authenticated user's role.</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q15: How would you enhance security in a commercial release?</div>
+        <div class="answer">
+        1. <strong>Password Hashing:</strong> Replace plaintext passwords with salted <strong>BCrypt</strong> hashing via Spring Security.
+        2. <strong>JSON Web Tokens (JWT):</strong> Issue signed JWT tokens upon login, verified by a Spring Security filter for every incoming request.
+        3. <strong>HTTPS / TLS:</strong> Encrypt all network packets to prevent Man-In-The-Middle packet inspection.
+        4. <strong>Rate Limiting:</strong> Enforce API rate limits with bucket4j to mitigate brute-force authentication attacks.</div>
+    </div>
+
+    <h2>7.7 Concurrency & Future Enhancements</h2>
+
+    <div class="qa-item">
+        <div class="question">Q16: How do you handle concurrent updates to an application status?</div>
+        <div class="answer">In high-concurrency systems, concurrent updates can cause dirty writes. In Spring Data JPA, we can implement <strong>Optimistic Locking</strong> by adding a <span class="code-inline">@Version private Long version;</span> field to the <span class="code-inline">Application</span> entity. If two recruiters modify the status simultaneously, the second update fails with an <span class="code-inline">OptimisticLockException</span>, prompting the user to reload the latest state.</div>
+    </div>
+
+    <div class="qa-item">
+        <div class="question">Q17: What future enhancements are planned for JobHub?</div>
+        <div class="answer">
+        1. <strong>AI Resume Parsing:</strong> Extract candidate skills and experience automatically from uploaded PDF resumes using NLP.
+        2. <strong>Real-Time Notifications:</strong> Push alerts via WebSockets when an application status updates to <span class="code-inline">ACCEPTED</span>.
+        3. <strong>Persistent Cloud Database:</strong> Transition H2 to AWS RDS PostgreSQL.
+        4. <strong>Interview Scheduler:</strong> Calendar integration with Google Calendar API for automated candidate interview scheduling.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 8 -->
+    <h1>8. Live Viva Demonstration Script</h1>
+    <p>Follow this exact chronological structure during your viva demo to showcase all modules smoothly:</p>
+
+    <div class="card">
+        <strong>Phase 1: Project Introduction (30 seconds)</strong>
+        <p style="margin: 0;">State the project name, real-world relevance, and decoupled 3-tier architecture (React 19 + Tailwind on frontend, Spring Boot on backend, and H2 in-memory DB).</p>
+    </div>
+
+    <div class="card">
+        <strong>Phase 2: Recruiter Workflow (1 minute)</strong>
+        <ol style="margin-top: 4pt; margin-bottom: 0;">
+            <li>Log in with Recruiter credentials (<span class="code-inline">techcorp@jobs.com</span> / <span class="code-inline">recruiter123</span>).</li>
+            <li>Show the <strong>Recruiter Dashboard</strong> metrics (active postings, total applicants).</li>
+            <li>Click <strong>Post a Job</strong> and create a listing (e.g. <em>"AI Engineer - $180,000"</em>).</li>
+            <li>Confirm that the new listing immediately appears in the platform job feed.</li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <strong>Phase 3: Candidate Workflow (1.5 minutes)</strong>
+        <ol style="margin-top: 4pt; margin-bottom: 0;">
+            <li>Log out and log in with Candidate credentials (<span class="code-inline">alex@seeker.com</span> / <span class="code-inline">seeker123</span>).</li>
+            <li>Browse the job catalog, demonstrate category filtering (e.g. <em>Data & AI</em>), and click on the newly posted vacancy.</li>
+            <li>Click <strong>Apply Now</strong>, submit a cover letter pitch and portfolio link.</li>
+            <li>Demonstrate duplicate validation by clicking <strong>Apply Now</strong> again on the same job.</li>
+            <li>Navigate to <strong>My Applications</strong> to show the real-time timeline tracking badge (<span class="badge-status status-pending">PENDING</span>).</li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <strong>Phase 4: Recruiter Review & Decision (1 minute)</strong>
+        <ol style="margin-top: 4pt; margin-bottom: 0;">
+            <li>Switch back to the Recruiter account.</li>
+            <li>Open the applicant review modal, inspect Alex's pitch, and click <strong>Accept Candidate</strong>.</li>
+            <li>Switch back to the candidate portal to demonstrate the status badge changing to <span class="badge-status status-accepted">ACCEPTED</span>.</li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <strong>Phase 5: Administrator Control Panel (30 seconds)</strong>
+        <ol style="margin-top: 4pt; margin-bottom: 0;">
+            <li>Log in with Admin credentials (<span class="code-inline">admin@jobhub.com</span> / <span class="code-inline">admin123</span>).</li>
+            <li>Display platform-wide metrics (total users, active jobs, submitted applications) and user account auditing.</li>
+        </ol>
+    </div>
+
+    <!-- SECTION 9 -->
+    <h1>9. Demo Credentials Reference</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Login Email</th>
+                <th>Password</th>
+                <th>Role Permissions & Capabilities</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Candidate (Alex)</strong></td>
+                <td><span class="code-inline">alex@seeker.com</span></td>
+                <td><span class="code-inline">seeker123</span></td>
+                <td>Search openings, submit applications, track application status history.</td>
+            </tr>
+            <tr>
+                <td><strong>Recruiter (Sarah)</strong></td>
+                <td><span class="code-inline">techcorp@jobs.com</span></td>
+                <td><span class="code-inline">recruiter123</span></td>
+                <td>Publish vacancies, review candidate submissions, update status to Accepted/Rejected.</td>
+            </tr>
+            <tr>
+                <td><strong>System Administrator</strong></td>
+                <td><span class="code-inline">admin@jobhub.com</span></td>
+                <td><span class="code-inline">admin123</span></td>
+                <td>Platform analytics, user moderation, role auditing, and universal listing removal.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
