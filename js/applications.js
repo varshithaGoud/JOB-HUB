@@ -24,14 +24,20 @@ const Applications = {
     },
 
     async loadApplications(userId) {
-        let remoteApps = [];
+        // 1. Instant local render (0ms delay)
+        const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
+        const userLocalApps = localApps.filter(a => String(a.userId) === String(userId));
+        this.updateCounts(userLocalApps);
+        this.render(userLocalApps);
 
+        // 2. Concurrently fetch remote applications with 1.5s timeout
+        let remoteApps = [];
         try {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-            const timeoutId = setTimeout(() => controller && controller.abort(), 2500);
+            const timeoutId = controller ? setTimeout(() => controller.abort(), 1500) : null;
 
             const res = await fetch(`${API_BASE}/applications/user/${userId}`, controller ? { signal: controller.signal } : {});
-            clearTimeout(timeoutId);
+            if (timeoutId) clearTimeout(timeoutId);
 
             if (res.ok) {
                 remoteApps = await res.json();
@@ -40,19 +46,16 @@ const Applications = {
             console.log("Using local application storage:", e.message);
         }
 
-        const localApps = JSON.parse(localStorage.getItem("local_applications") || "[]");
-        const userLocalApps = localApps.filter(a => String(a.userId) === String(userId));
-
-        // Deduplicate
-        const appMap = {};
-        userLocalApps.forEach(a => { appMap[a.jobId] = a; });
-        if (Array.isArray(remoteApps)) {
+        // Deduplicate and re-render if remote apps were returned
+        if (Array.isArray(remoteApps) && remoteApps.length > 0) {
+            const appMap = {};
+            userLocalApps.forEach(a => { appMap[a.jobId] = a; });
             remoteApps.forEach(a => { appMap[a.jobId] = a; });
-        }
 
-        const combined = Object.values(appMap);
-        this.updateCounts(combined);
-        this.render(combined);
+            const combined = Object.values(appMap);
+            this.updateCounts(combined);
+            this.render(combined);
+        }
     },
 
     updateCounts(apps) {
